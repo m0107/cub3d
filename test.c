@@ -50,6 +50,8 @@ typedef struct  s_player {
 	double planeY;
 }               t_player;
 
+
+
 typedef struct  s_data {
     void        *img;
     char        *addr;
@@ -65,6 +67,11 @@ typedef struct  s_vars {
 	t_data 		img;
 }               t_vars;
 
+typedef struct  s_game {
+    t_player	player;
+	t_vars		vars;
+}               t_game;
+
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
     char    *dst;
@@ -74,51 +81,37 @@ void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 }
 
 
-int             close1(int keycode, char *vars)
-{
-	printf("close1 called");
-	printf("%d\n",keycode);
-	printf("*********%s\n", (vars));
-
-	return (1);
-}
-
-int             close(int keycode, t_vars *vars)
-{
-
-	printf("close called");
-	printf("%d\n",keycode);
-	(void)vars;
-	if(keycode == 53)
-	{	
-		mlx_destroy_window(vars->mlx, vars->win);
-		exit(1);
-	}
-	return (1);
-}
-
 void print_line(t_vars vars, int x, int drawStart, int drawEnd, int color)
 {
-	printf("x: %d,  drawStart: %d,   drawEnd: %d color:%d\n", x, drawStart, drawEnd, color);
+	//printf("x: %d,  drawStart: %d,   drawEnd: %d color:%d\n", x, drawStart, drawEnd, color);
 	int i,j;
-	for ( i = drawStart; i <= drawEnd+5; i++)
+	for(i = 0; i < drawStart; i++)
+	{
+		my_mlx_pixel_put(&vars.img, x, i, 0x00000000);
+	}
+	for ( i = drawStart; i <= drawEnd; i++)
 	{
 		
 			my_mlx_pixel_put(&vars.img, x, i, color);
 	}
+
+	for(i = drawEnd; i < screenHeight; i++)
+	{
+		my_mlx_pixel_put(&vars.img, x, i, 0x00000000);
+	}
 }
 
 
-void render(t_player player, t_vars vars)
+void render(t_game game)
 {
 	for(int x = 0; x < screenWidth; x++) {
 			//calculate ray position and direction
 			double cameraX = 2 * x / (double)screenWidth - 1; //x-coordinate in camera space
-			double rayDirX = player.dirX + player.planeX * cameraX;
-			double rayDirY = player.dirY + player.planeY * cameraX;
+			double rayDirX = game.player.dirX + game.player.planeX * cameraX;
+			double rayDirY = game.player.dirY + game.player.planeY * cameraX;
 			//which box of the map we're in
-			int mapX = (int)player.posX;
-			int mapY = (int)player.posY;
+			int mapX = (int)game.player.posX;
+			int mapY = (int)game.player.posY;
 
 			//length of ray from current position to next x or y-side
 			double sideDistX;
@@ -138,17 +131,17 @@ void render(t_player player, t_vars vars)
 			//calculate step and initial sideDist
 			if(rayDirX < 0) {
 				stepX = -1;
-				sideDistX = (player.posX - mapX) * deltaDistX;
+				sideDistX = (game.player.posX - mapX) * deltaDistX;
 			}else {
 				stepX = 1;
-				sideDistX = (mapX + 1.0 - player.posX) * deltaDistX;
+				sideDistX = (mapX + 1.0 - game.player.posX) * deltaDistX;
 			}
 			if(rayDirY < 0) {
 				stepY = -1;
-				sideDistY = (player.posY - mapY) * deltaDistY;
+				sideDistY = (game.player.posY - mapY) * deltaDistY;
 			}else {
 				stepY = 1;
-				sideDistY = (mapY + 1.0 - player.posY) * deltaDistY;
+				sideDistY = (mapY + 1.0 - game.player.posY) * deltaDistY;
 			}
 			//perform DDA
 			while (hit == 0) {
@@ -166,8 +159,8 @@ void render(t_player player, t_vars vars)
 				if(worldMap[mapX][mapY] > 0) hit = 1;
 			}
 			//Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
-			if(side == 0) perpWallDist = (mapX - player.posX + (1 - stepX) / 2) / rayDirX;
-			else          perpWallDist = (mapY - player.posY + (1 - stepY) / 2) / rayDirY;
+			if(side == 0) perpWallDist = (mapX - game.player.posX + (1 - stepX) / 2) / rayDirX;
+			else          perpWallDist = (mapY - game.player.posY + (1 - stepY) / 2) / rayDirY;
 
 			//Calculate height of line to draw on screen
 			int lineHeight = (int)(screenHeight / perpWallDist);
@@ -194,61 +187,94 @@ void render(t_player player, t_vars vars)
 			//draw the pixels of the stripe as a vertical line
 			//verLine(x, drawStart, drawEnd, color);
 			//printf("MOhit");
-			print_line(vars, x, drawStart, drawEnd, color);
+			print_line(game.vars, x, drawStart, drawEnd, color);
 		}
-		mlx_put_image_to_window(vars.mlx, vars.win, vars.img.img, 0, 0);	
+		mlx_put_image_to_window(game.vars.mlx, game.vars.win, game.vars.img.img, 0, 0);	
 }
 
+int             close(int keycode, t_game *game)
+{
+
+		
+
+		//speed modifiers
+		double moveSpeed = 0.1; //the constant value is in squares/second
+		
+		printf("pos x: %f | y: %f\n", game->player.posX, game->player.posY);
+		
+		
+		
+	
+     // if(worldMap[(int)(game->player.posX + game->player.dirX * 0.1)][(int)game->player.posY] == 0) game->player.posX += game->player.dirX * moveSpeed;
+      //if(worldMap[(int)game->player.posX][(int)(game->player.posY + game->player.dirY * moveSpeed)] == 0) game->player.posY += game->player.dirY * moveSpeed;
+    
+	if(keycode == 13)
+	{		
+		if(worldMap[(int)(game->player.posX + game->player.dirX * moveSpeed)][(int)game->player.posY] == 0) game->player.posX += game->player.dirX * moveSpeed;
+		if(worldMap[(int)game->player.posX][(int)(game->player.posY + game->player.dirY * moveSpeed)] == 0) game->player.posY += game->player.dirY * moveSpeed;
+		render(*game);
+	}
+
+	if(keycode == 1)
+	{
+		if(worldMap[(int)(game->player.posX - game->player.dirX * moveSpeed)][(int)game->player.posY] == 0) game->player.posX -= game->player.dirX * moveSpeed;
+		if(worldMap[(int)game->player.posX][(int)(game->player.posY - game->player.dirY * moveSpeed)] == 0) game->player.posY -= game->player.dirY * moveSpeed;
+		render(*game);
+	//	if(worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) posX -= dirX * moveSpeed;
+    //  if(worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) posY -= dirY * moveSpeed;
+	}
+	if (keycode == 2)
+	{
+		if(worldMap[(int)game->player.posX][(int)(game->player.posY + moveSpeed)] == 0) game->player.posY +=  moveSpeed;
+		render(*game);
+	}
+
+	if(keycode == 0)
+	{
+		if(worldMap[(int)game->player.posX][(int)(game->player.posY - moveSpeed)] == 0) game->player.posY -=  moveSpeed;
+		render(*game);
+	//	if(worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) posX -= dirX * moveSpeed;
+    //  if(worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) posY -= dirY * moveSpeed;
+	}
+
+
+
+	if(keycode == 53)
+	{	
+		mlx_destroy_window(game->vars.mlx, game->vars.win);
+		exit(1);
+	}
+	return (1);
+}
 
 
 int             main(void)
 {
+	t_game		game;
+	game.player.posX = 22;
+	game.player.posY = 12;  //x and y start position
+	game.player.dirX = -1; 
+	game.player.dirY = 0; //initial direction vector
+	game.player.planeX = 0; 
+	game.player.planeY = 0.66; //the 2d raycaster version of camera plane
 
-	t_player	player;
-	player.posX = 22;
-	player.posY = 12;  //x and y start position
-	player.dirX = -1; 
-	player.dirY = 0; //initial direction vector
-	player.planeX = 0; 
-	player.planeY = 0.66; //the 2d raycaster version of camera plane
 
-	double time = 0; //time of current frame
-	double oldTime = 0; //time of previous frame
-
-	t_vars      vars;
-
-	vars.mlx = mlx_init();
-    vars.win = mlx_new_window(vars.mlx, screenWidth, screenWidth, "Hello world!");
+	game.vars.mlx = mlx_init();
+    game.vars.win = mlx_new_window(game.vars.mlx, screenWidth, screenWidth, "Hello world!");
     //mlx = mlx_init();
 
 
     //mlx_win = mlx_new_window(mlx, 1920, 1080, "Hello world!");
-    vars.img.img = mlx_new_image(vars.mlx, 1920, 1080);
-    vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length,
-                                 &vars.img.endian);
+    game.vars.img.img = mlx_new_image(game.vars.mlx, 1920, 1080);
+    game.vars.img.addr = mlx_get_data_addr(game.vars.img.img, &game.vars.img.bits_per_pixel, &game.vars.img.line_length,
+                                 &game.vars.img.endian);
 
 	//print_line(vars);	
 	int temp = 0;
 	while(temp == 0) {
-		render(player, vars);
-		printf("Mohit");
-		//timing for input and FPS counter
-		oldTime = time;
-		//time = getTicks();
-		double frameTime = (time - oldTime) / 1000.0; //frameTime is the time this frame has taken, in seconds
-		//print(1.0 / frameTime); //FPS counter
-		//redraw();
-		//cls();
-
-		//speed modifiers
-		double moveSpeed = frameTime * 5.0; //the constant value is in squares/second
-		double rotSpeed = frameTime * 3.0; //the constant value is in radians/second
-		mlx_hook(vars.win, 2, 1L<<0, close, &vars);
-		char  *c = "MOhit";
-		printf("%s", c);
-		//mlx_hook(vars.win, 2, 1L<<0, close1, c);
-		
-		mlx_loop(vars.mlx);
+		render(game);
+		mlx_hook(game.vars.win, 2, 1L<<0, close, &game);	
+		mlx_loop(game.vars.mlx);
   	}
 }
 
