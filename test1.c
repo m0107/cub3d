@@ -10,8 +10,6 @@
 #define mapWidth 24
 #define mapHeight 24
 
-enum ColorRGB{RGB_Red, RGB_Green, RGB_Blue, RGB_White, RGB_Yellow}; 
-
 int worldMap[mapWidth][mapHeight]=
 {
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -40,6 +38,17 @@ int worldMap[mapWidth][mapHeight]=
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
+typedef struct  s_player {
+	// double posX = 22, posY = 12;  //x and y start position
+	// double dirX = -1, dirY = 0; //initial direction vector
+	// double planeX = 0, planeY = 0.66; //the 2d raycaster version of camera plane
+    double posX;
+	double posY;
+	double dirX;
+	double dirY;
+	double planeX;
+	double planeY;
+}               t_player;
 
 typedef struct  s_data {
     void        *img;
@@ -99,39 +108,17 @@ void print_line(t_vars vars, int x, int drawStart, int drawEnd, int color)
 	}
 }
 
-int             main(void)
+
+void render(t_player player, t_vars vars)
 {
-
-	double posX = 22, posY = 12;  //x and y start position
-	double dirX = -1, dirY = 0; //initial direction vector
-	double planeX = 0, planeY = 0.66; //the 2d raycaster version of camera plane
-
-	double time = 0; //time of current frame
-	double oldTime = 0; //time of previous frame
-
-	t_vars      vars;
-
-	vars.mlx = mlx_init();
-    vars.win = mlx_new_window(vars.mlx, screenWidth, screenWidth, "Hello world!");
-    //mlx = mlx_init();
-
-
-    //mlx_win = mlx_new_window(mlx, 1920, 1080, "Hello world!");
-    vars.img.img = mlx_new_image(vars.mlx, 1920, 1080);
-    vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length,
-                                 &vars.img.endian);
-
-	//print_line(vars);	
-	int temp = 0;
-	while(temp == 0) {
-		for(int x = 0; x < screenWidth; x++) {
+	for(int x = 0; x < screenWidth; x++) {
 			//calculate ray position and direction
 			double cameraX = 2 * x / (double)screenWidth - 1; //x-coordinate in camera space
-			double rayDirX = dirX + planeX * cameraX;
-			double rayDirY = dirY + planeY * cameraX;
+			double rayDirX = player.dirX + player.planeX * cameraX;
+			double rayDirY = player.dirY + player.planeY * cameraX;
 			//which box of the map we're in
-			int mapX = (int)posX;
-			int mapY = (int)posY;
+			int mapX = (int)player.posX;
+			int mapY = (int)player.posY;
 
 			//length of ray from current position to next x or y-side
 			double sideDistX;
@@ -151,17 +138,17 @@ int             main(void)
 			//calculate step and initial sideDist
 			if(rayDirX < 0) {
 				stepX = -1;
-				sideDistX = (posX - mapX) * deltaDistX;
+				sideDistX = (player.posX - mapX) * deltaDistX;
 			}else {
 				stepX = 1;
-				sideDistX = (mapX + 1.0 - posX) * deltaDistX;
+				sideDistX = (mapX + 1.0 - player.posX) * deltaDistX;
 			}
 			if(rayDirY < 0) {
 				stepY = -1;
-				sideDistY = (posY - mapY) * deltaDistY;
+				sideDistY = (player.posY - mapY) * deltaDistY;
 			}else {
 				stepY = 1;
-				sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+				sideDistY = (mapY + 1.0 - player.posY) * deltaDistY;
 			}
 			//perform DDA
 			while (hit == 0) {
@@ -179,12 +166,11 @@ int             main(void)
 				if(worldMap[mapX][mapY] > 0) hit = 1;
 			}
 			//Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
-			if(side == 0) perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
-			else          perpWallDist = (mapY - posY + (1 - stepY) / 2) / rayDirY;
+			if(side == 0) perpWallDist = (mapX - player.posX + (1 - stepX) / 2) / rayDirX;
+			else          perpWallDist = (mapY - player.posY + (1 - stepY) / 2) / rayDirY;
 
 			//Calculate height of line to draw on screen
 			int lineHeight = (int)(screenHeight / perpWallDist);
-
 			//calculate lowest and highest pixel to fill in current stripe
 			int drawStart = -lineHeight / 2 + screenHeight / 2;
 			if(drawStart < 0)drawStart = 0;
@@ -210,6 +196,42 @@ int             main(void)
 			//printf("MOhit");
 			print_line(vars, x, drawStart, drawEnd, color);
 		}
+		mlx_put_image_to_window(vars.mlx, vars.win, vars.img.img, 0, 0);	
+}
+
+
+
+int             main(void)
+{
+
+	t_player	player;
+	player.posX = 22;
+	player.posY = 12;  //x and y start position
+	player.dirX = -1; 
+	player.dirY = 0; //initial direction vector
+	player.planeX = 0; 
+	player.planeY = 0.66; //the 2d raycaster version of camera plane
+
+	double time = 0; //time of current frame
+	double oldTime = 0; //time of previous frame
+
+	t_vars      vars;
+
+	vars.mlx = mlx_init();
+    vars.win = mlx_new_window(vars.mlx, screenWidth, screenWidth, "Hello world!");
+    //mlx = mlx_init();
+
+
+    //mlx_win = mlx_new_window(mlx, 1920, 1080, "Hello world!");
+    vars.img.img = mlx_new_image(vars.mlx, 1920, 1080);
+    vars.img.addr = mlx_get_data_addr(vars.img.img, &vars.img.bits_per_pixel, &vars.img.line_length,
+                                 &vars.img.endian);
+
+	//print_line(vars);	
+	int temp = 0;
+	while(temp == 0) {
+		render(player, vars);
+		printf("Mohit");
 		//timing for input and FPS counter
 		oldTime = time;
 		//time = getTicks();
@@ -225,7 +247,7 @@ int             main(void)
 		char  *c = "MOhit";
 		printf("%s", c);
 		//mlx_hook(vars.win, 2, 1L<<0, close1, c);
-		mlx_put_image_to_window(vars.mlx, vars.win, vars.img.img, 0, 0);	
+		
 		mlx_loop(vars.mlx);
   	}
 }

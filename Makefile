@@ -23,7 +23,7 @@ ft_lstsize.c \
 
 
 #include all your main .c files here
-SRCS = test.c 
+SRCS = test1.c 
 
 
 
