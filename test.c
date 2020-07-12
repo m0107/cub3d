@@ -3,12 +3,15 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "libft/libft.h"
 
 
 #define screenWidth 640
 #define screenHeight 480
 #define mapWidth 24
 #define mapHeight 24
+#define texWidth 64
+#define texHeight 64
 
 int worldMap[mapWidth][mapHeight]=
 {
@@ -72,6 +75,57 @@ typedef struct  s_game {
 	t_vars		vars;
 }               t_game;
 
+typedef struct	s_texture
+{
+	int				width;
+	int				height;
+	char			*filename;
+	void			*ptr;
+	char			*data;
+}				t_texture;
+
+void		get_pixel_color(t_texture texture, int x, int y,
+		unsigned char *result)
+{
+
+	int index;
+	int i;
+
+	if (x >= texture.width || y >= texture.height)
+		return ;
+	if (x < 0 || y < 0)
+		return ;
+	index = (x + y * texture.width) * 4;
+	i = -1;
+	while (++i < 4)
+	{
+		result[i] = (int)texture.data[index + i];
+		
+	}
+	
+}
+
+void	load_texture(void *mlx_ptr, char *filename, t_texture *res)
+{
+	
+	int			config[3];
+	
+	res->ptr = mlx_xpm_file_to_image(mlx_ptr, filename,
+			&(res->width), &(res->height));
+	if (res->ptr == 0){
+		printf("Not able to read");
+	}
+	config[0] = 32;
+	config[1] = res->width * 4;
+	config[2] = 0;
+	res->data = mlx_get_data_addr(res->ptr,
+			&config[0], &config[1], &config[2]);
+	if(res->data == 0)
+	{
+		printf("reading failed");
+	}
+}
+
 void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
     char    *dst;
@@ -79,28 +133,19 @@ void            my_mlx_pixel_put(t_data *data, int x, int y, int color)
     dst = data->addr + (y * data->line_length + x * (data->bits_per_pixel / 8));
     *(unsigned int*)dst = color;
 }
-
-
-void print_line(t_vars vars, int x, int drawStart, int drawEnd, int color)
+void	draw_pixel(t_data *data, unsigned int x, unsigned int y,
+	unsigned char color[4])
 {
-	//printf("x: %d,  drawStart: %d,   drawEnd: %d color:%d\n", x, drawStart, drawEnd, color);
-	int i,j;
-	for(i = 0; i < drawStart; i++)
-	{
-		my_mlx_pixel_put(&vars.img, x, i, 0x00000000);
-	}
-	for ( i = drawStart; i <= drawEnd; i++)
-	{
-		
-			my_mlx_pixel_put(&vars.img, x, i, color);
-	}
+	int index;
+	int	i;
 
-	for(i = drawEnd; i < screenHeight; i++)
-	{
-		my_mlx_pixel_put(&vars.img, x, i, 0x00000000);
-	}
+	if (x >= screenWidth || y >= screenHeight)
+		return ;
+	index = x * 4 + (y * data->line_length);
+	i = -1;
+	while (++i < 4)
+		data->addr[index + i] = color[i];
 }
-
 
 void render(t_game game)
 {
@@ -170,37 +215,67 @@ void render(t_game game)
 			int drawEnd = lineHeight / 2 + screenHeight / 2;
 			if(drawEnd >= screenHeight)drawEnd = screenHeight - 1;
 
-			//choose wall color
-			int color;
-			switch(worldMap[mapX][mapY])
+
+			
+
+			//calculate value of wallX
+			double wallX; //where exactly the wall was hit
+			if (side == 0) wallX = game.player.posY + perpWallDist * rayDirY;
+			else           wallX = game.player.posX + perpWallDist * rayDirX;
+			wallX -= floor((wallX));
+
+			//x coordinate on the texture
+			int texX = (int)(wallX * (double)(texWidth));
+			if(side == 0 && rayDirX > 0) texX = texWidth - texX - 1;
+			if(side == 1 && rayDirY < 0) texX = texWidth - texX - 1;
+
+			t_texture temp_tex;
+			
+			load_texture(game.vars.mlx, "./pics/wall1.xpm", &temp_tex);
+			
+			// How much to increase the texture coordinate per screen pixel
+			double step = 1.0 * texHeight / lineHeight;
+			// Starting texture coordinate
+			double texPos = (drawStart - screenHeight / 2 + lineHeight / 2) * step;
+			int i;
+			for(i = 0; i < drawStart; i++)
 			{
-				case 1:  color = 0x00FF0000;    break; //red
-				case 2:  color = 0x0000FF00;  break; //green
-				case 3:  color = 0x000000FF;   break; //blue
-				case 4:  color = 0X00FFFFFF;  break; //white
-				default: color = 0x00CCCC00; break; //yellow
+				my_mlx_pixel_put(&game.vars.img, x, i, 11793663);
+			}
+			for(i = drawStart; i < drawEnd; i++)
+			{
+				// Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
+				int texY = (int)texPos & (texHeight - 1);
+				texPos += step;
+				unsigned char color[4];
+				get_pixel_color(temp_tex, texX, texY, color);
+				
+					draw_pixel(&game.vars.img, x, i, color);
+		
+				//printf("pos x: %d | i: %d\n",x, i);
+		
+				//my_mlx_pixel_put(&game.vars.img, x, i, 0x00ff0000);
+			}
+			for(i = drawEnd; i < screenHeight; i++)
+			{
+				my_mlx_pixel_put(&game.vars.img, x, i, 0x009B7653);
 			}
 
-			//give x and y sides different brightness
-			if(side == 1) {color = color / 2;}
-
-			//draw the pixels of the stripe as a vertical line
-			//verLine(x, drawStart, drawEnd, color);
-			//printf("MOhit");
-			print_line(game.vars, x, drawStart, drawEnd, color);
+			//printf(" value of i in end : %d\n", i);
+			//print_line(game.vars, x, drawStart, drawEnd, color);
 		}
 		mlx_put_image_to_window(game.vars.mlx, game.vars.win, game.vars.img.img, 0, 0);	
 }
 
-int             close(int keycode, t_game *game)
+int             ft_close(int keycode, t_game *game)
 {
 
 		
 
 		//speed modifiers
 		double moveSpeed = 0.1; //the constant value is in squares/second
-		
-		printf("pos x: %f | y: %f\n", game->player.posX, game->player.posY);
+		double rotSpeed = 0.3; //the constant value is in radians/second
+		//printf("pos x: %f | y: %f\n", game->player.posX, game->player.posY);
 		
 		
 		
@@ -224,20 +299,54 @@ int             close(int keycode, t_game *game)
     //  if(worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) posY -= dirY * moveSpeed;
 	}
 	if (keycode == 2)
-	{
-		if(worldMap[(int)game->player.posX][(int)(game->player.posY + moveSpeed)] == 0) game->player.posY +=  moveSpeed;
+	{  	rotSpeed = 1.5708;
+		double oldDirX = game->player.dirX;
+		double tempx = game->player.dirX * cos(-rotSpeed) - game->player.dirY * sin(-rotSpeed);
+      	double tempy = oldDirX * sin(-rotSpeed) + game->player.dirY * cos(-rotSpeed);
+
+		if(worldMap[(int)(game->player.posX + tempx * moveSpeed)][(int)game->player.posY] == 0) game->player.posX += tempx * moveSpeed;
+		if(worldMap[(int)game->player.posX][(int)(game->player.posY + tempy * moveSpeed)] == 0) game->player.posY += tempy * moveSpeed;
 		render(*game);
 	}
 
 	if(keycode == 0)
-	{
-		if(worldMap[(int)game->player.posX][(int)(game->player.posY - moveSpeed)] == 0) game->player.posY -=  moveSpeed;
+	{	
+		rotSpeed = -1.5708;
+		double oldDirX = game->player.dirX;
+		double tempx  = game->player.dirX * cos(rotSpeed) - game->player.dirY * sin(rotSpeed);
+      	double tempy  = oldDirX * sin(rotSpeed) + game->player.dirY * cos(rotSpeed);
+
+		if(worldMap[(int)(game->player.posX - tempx * moveSpeed)][(int)game->player.posY] == 0) game->player.posX -= tempx * moveSpeed;
+		if(worldMap[(int)game->player.posX][(int)(game->player.posY - tempy * moveSpeed)] == 0) game->player.posY -= tempy * moveSpeed;
 		render(*game);
 	//	if(worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) posX -= dirX * moveSpeed;
     //  if(worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) posY -= dirY * moveSpeed;
 	}
-
-
+	//turn right
+	if(keycode == 124)
+    {
+      //both camera direction and camera plane must be rotated
+	  
+      double oldDirX = game->player.dirX;
+      game->player.dirX = game->player.dirX * cos(-rotSpeed) - game->player.dirY * sin(-rotSpeed);
+      game->player.dirY = oldDirX * sin(-rotSpeed) + game->player.dirY * cos(-rotSpeed);
+      double oldPlaneX = game->player.planeX;
+      game->player.planeX = game->player.planeX * cos(-rotSpeed) - game->player.planeY * sin(-rotSpeed);
+      game->player.planeY = oldPlaneX * sin(-rotSpeed) + game->player.planeY * cos(-rotSpeed);
+	  render(*game);
+    }
+    //rotate to the left
+    if(keycode == 123)
+    {
+      //both camera direction and camera plane must be rotated
+      double oldDirX = game->player.dirX;
+      game->player.dirX = game->player.dirX * cos(rotSpeed) - game->player.dirY * sin(rotSpeed);
+      game->player.dirY = oldDirX * sin(rotSpeed) + game->player.dirY * cos(rotSpeed);
+      double oldPlaneX = game->player.planeX;
+      game->player.planeX = game->player.planeX * cos(rotSpeed) - game->player.planeY * sin(rotSpeed);
+      game->player.planeY = oldPlaneX * sin(rotSpeed) + game->player.planeY * cos(rotSpeed);
+	  render(*game);
+    }
 
 	if(keycode == 53)
 	{	
@@ -260,10 +369,10 @@ int             main(void)
 
 
 	game.vars.mlx = mlx_init();
-    game.vars.win = mlx_new_window(game.vars.mlx, screenWidth, screenWidth, "Hello world!");
+    game.vars.win = mlx_new_window(game.vars.mlx, screenWidth, screenHeight, "Hello world!");
     //mlx = mlx_init();
 
-
+	
     //mlx_win = mlx_new_window(mlx, 1920, 1080, "Hello world!");
     game.vars.img.img = mlx_new_image(game.vars.mlx, 1920, 1080);
     game.vars.img.addr = mlx_get_data_addr(game.vars.img.img, &game.vars.img.bits_per_pixel, &game.vars.img.line_length,
@@ -273,7 +382,7 @@ int             main(void)
 	int temp = 0;
 	while(temp == 0) {
 		render(game);
-		mlx_hook(game.vars.win, 2, 1L<<0, close, &game);	
+		mlx_hook(game.vars.win, 2, 1L<<0, ft_close, &game);
 		mlx_loop(game.vars.mlx);
   	}
 }

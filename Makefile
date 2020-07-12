@@ -4,11 +4,14 @@ NAME = cub3D
 CC = gcc  # C compiler
 
 #CFLAGS = -Wall -Werror -Wextra -I. -Ilibft/. -c  # C flags
-CFLAGS =  -I. -Ilibft/. -c  # C flags
+CFLAGS =  -I. -Ilibft/. -Imlx/. -c  # C flags
 
 RM = rm -f   # rm command
-LB_NAME =	libft.a
-LIB_DIR	=	./libft
+LIBFT_DIR	=	./libft
+LIBFT =	$(LIB_DIR)/libft.a
+
+MLX_DIR = ./mlx
+MLX = $(MLX_DIR)/libmlx.a
 
 # Include all your bonus files here
 #B_SRCS = ft_lstadd_back.c \
@@ -25,30 +28,26 @@ ft_lstsize.c \
 #include all your main .c files here
 SRCS = test.c 
 
-
-
-
 OBJS = $(SRCS:.c=.o)
 
-#B_OBJS = $(B_SRCS:.c=.o)
 
-all: libft minilibx $(NAME)
+all: $(LIBFT) $(MLX) $(NAME)
 
-libft:
+$(LIBFT):
+	@printf "compiling libft"
 	make -C libft/
 
-minilibx:
-	make -C minilibx/
+$(MLX):
+	@printf "compiling mlx"
+	make -C mlx/
 
-${LIB_DIR}/${LB_NAME}:
-		${MAKE} -C $(LIB_DIR)
 
 $(NAME): $(OBJS)
-	$(CC) -o $@ $^ -Lminilibx/ -lmlx -framework OPENGL -framework Appkit -Llibft -lft
+	$(CC) -o $@ $^ -Lmlx -lmlx -framework OPENGL -framework Appkit -lm -Llibft -lft
 
 $(OBJS):$(SRCS)
 	@printf "Compiling $<"
-	@gcc  -Imlx -Iinc -Ilibft -c $< -o $@
+	@gcc  -Imlx -Ilibft -c $< -o $@
 	#@gcc -Wall -Wextra -Werror -Imlx -Iinc -Ilibft -c $< -o $@
 
 #$(B_OBJS):$(B_SRCS)
@@ -59,14 +58,14 @@ $(OBJS):$(SRCS)
 #	ar rcs $(NAME) $(OBJS) $(B_OBJS)
 
 clean:
-	rm -f $(OBJS) $(B_OBJS)
-	${MAKE} -C $(LIB_DIR) fclean
-	make -C ./minilibx/ clean
+	rm -f $(OBJS)
+	make -C $(LIBFT_DIR) clean
+	make -C $(MLX_DIR) clean
 
 fclean: clean
-	rm -f $(NAME)
-	${MAKE} -C $(LIB_DIR) fclean
-	make -C ./minilibx/ clean
+	rm -f $(NAME) $(MLX)
+	make -C $(LIBFT_DIR) fclean
+	make -C $(MLX_DIR) fclean
 
 
 re: fclean all
