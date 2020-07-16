@@ -4,7 +4,7 @@ NAME = cub3D
 CC = gcc  # C compiler
 
 #CFLAGS = -Wall -Werror -Wextra -I. -Ilibft/. -c  # C flags
-CFLAGS =  -I. -Ilibft/. -Imlx/. -c  # C flags
+CFLAGS =  -Isrc/. -Ilibft/. -Imlx/. -Ignl/. -c  # C flags
 
 RM = rm -f   # rm command
 LIBFT_DIR	=	./libft
@@ -26,28 +26,34 @@ ft_lstsize.c \
 
 
 #include all your main .c files here
-SRCS = test.c 
+SRCS = ./src/parser/main_parser.c \
+./src/main.c \
+./gnl/get_next_line.c \
+./gnl/get_next_line_utils.c \
+
+
 
 OBJS = $(SRCS:.c=.o)
 
 
-all: $(LIBFT) $(MLX) $(NAME)
-
-$(LIBFT):
-	@printf "compiling libft"
-	make -C libft/
-
+all:  $(MLX) $(LIBFT) $(NAME)
+	@printf "mohit"
 $(MLX):
 	@printf "compiling mlx"
 	make -C mlx/
 
+$(LIBFT):
+	@printf "compiling libft\n"
+	make -C libft/
 
 $(NAME): $(OBJS)
-	$(CC) -o $@ $^ -Lmlx -lmlx -framework OPENGL -framework Appkit -lm -Llibft -lft
+	@printf "$(OBJS)"
+	$(CC) -Imlx -Ilibft -Ignl -o $@ $^ -Lmlx -lmlx -framework OPENGL -framework Appkit -lm -Llibft -lft
 
 $(OBJS):$(SRCS)
+	@printf "$(OBJS)"
 	@printf "Compiling $<"
-	@gcc  -Imlx -Ilibft -c $< -o $@
+	@gcc  -Imlx -Ilibft -Ignl -c $< -o $@
 	#@gcc -Wall -Wextra -Werror -Imlx -Iinc -Ilibft -c $< -o $@
 
 #$(B_OBJS):$(B_SRCS)
