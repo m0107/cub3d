@@ -13,6 +13,7 @@ LIBFT =	$(LIB_DIR)/libft.a
 MLX_DIR = ./mlx
 MLX = $(MLX_DIR)/libmlx.a
 
+
 # Include all your bonus files here
 #B_SRCS = ft_lstadd_back.c \
 ft_lstadd_front.c \
@@ -26,35 +27,47 @@ ft_lstsize.c \
 
 
 #include all your main .c files here
-SRCS = ./src/parser/main_parser.c \
-./src/main.c \
-./gnl/get_next_line.c \
-./gnl/get_next_line_utils.c \
+SRCS = ./src/main.c \
+src/parser/main_parser.c \
+src/parser/tex_parser.c \
+src/parser/res_parser.c \
+src/parser/color_parser.c \
 
 
+GNL_SRCS = gnl/get_next_line.c \
+gnl/get_next_line_utils.c \
+
+GNL_OBJS = $(GNL_SRCS:.c=.o)
 
 OBJS = $(SRCS:.c=.o)
 
 
-all:  $(MLX) $(LIBFT) $(NAME)
-	@printf "mohit"
+all:  $(MLX) $(LIBFT)  $(NAME)
+	@printf "Makefile starts\n"
+
+gnl/%.o: gnl/%.c
+	$(CC) -Ignl -c $< -o $@
+
 $(MLX):
-	@printf "compiling mlx"
+	@printf "compiling mlx\n"
 	make -C mlx/
 
 $(LIBFT):
 	@printf "compiling libft\n"
 	make -C libft/
 
-$(NAME): $(OBJS)
-	@printf "$(OBJS)"
-	$(CC) -Imlx -Ilibft -Ignl -o $@ $^ -Lmlx -lmlx -framework OPENGL -framework Appkit -lm -Llibft -lft
+$(NAME): $(OBJS) $(GNL_OBJS)
+	@printf "$(OBJS)\n"
+	$(CC) -Isrc -Imlx -Ilibft -Ignl -o $@ $^ -Lmlx -lmlx -framework OPENGL -framework Appkit -lm -Llibft -lft
 
-$(OBJS):$(SRCS)
-	@printf "$(OBJS)"
-	@printf "Compiling $<"
-	@gcc  -Imlx -Ilibft -Ignl -c $< -o $@
-	#@gcc -Wall -Wextra -Werror -Imlx -Iinc -Ilibft -c $< -o $@
+
+src/%.o: src/%.c
+	$(CC) -Ignl -c $< -o $@
+
+
+src/parser/%.o: src/parser/%.c
+	$(CC) -Ignl -c $< -o $@
+
 
 #$(B_OBJS):$(B_SRCS)
 #	$(CC) $(CFLAGS) $(B_SRCS)
@@ -65,13 +78,13 @@ $(OBJS):$(SRCS)
 
 clean:
 	rm -f $(OBJS)
-	make -C $(LIBFT_DIR) clean
-	make -C $(MLX_DIR) clean
+	#make -C $(LIBFT_DIR) clean
+	#make -C $(MLX_DIR) clean
 
 fclean: clean
-	rm -f $(NAME) $(MLX)
-	make -C $(LIBFT_DIR) fclean
-	make -C $(MLX_DIR) fclean
+	rm -f $(NAME)
+	#make -C $(LIBFT_DIR) fclean
+	#make -C $(MLX_DIR) fclean
 
 
 re: fclean all

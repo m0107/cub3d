@@ -51,6 +51,8 @@ typedef struct  s_data {
 typedef struct  s_vars {
 	int			screenWidth;
 	int			screenHeight;
+	int			floor_color;
+	int			ceiling_color;
 	void        *mlx;
 	void        *win;
 	t_data 		img;
@@ -72,7 +74,19 @@ typedef struct  s_game {
 	int 		*map[];
 }               t_game;
 
-void	main_parser(t_game *game, char * filename);
-int		get_next_line(int const fd, char **line);
+void	main_parser(t_game *game, char *filename);
+
+int		res_parser(t_game *game, char *line);
+int		check_n_set_res(t_game *game,int screenWidth, int screenHeight);
+
+int		tex_parser(t_game *game, char *line);
+int		load_texture(void *mlx_ptr, char *filename, t_texture *res);
+
+int		color_parser(t_game *game, char *line);
+
+
+int		checkno_cub(long ans, int sign);
+int		ft_atoi_cub(char **str);
+char	*remove_space(char *line);
 
 #endif

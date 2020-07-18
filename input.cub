@@ -1,12 +1,13 @@
-R 1920 1080
-NO ./path_to_the_north_texture
-SO ./path_to_the_south_texture
-WE ./path_to_the_west_texture
-EA ./path_to_the_east_texture
+R     1920     1080
+NO /Users/mgupta/42/Cube3d/mgupta/res/orangebrick.xpm
+SO /Users/mgupta/42/Cube3d/mgupta/res/wall1.xpm
+WE      /Users/mgupta/42/Cube3d/mgupta/res/bluebrick.xpm
+
+EA /Users/mgupta/42/Cube3d/mgupta/res/wall3.xpm
 
 S ./path_to_the_sprite_texture
-F 220,100,0
-C 225,30,0
+F 220,   100,0
+C    100,225,    255
 
         1111111111111111111111111
         1000000000110000000000001
