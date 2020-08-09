@@ -60,22 +60,38 @@ void	main_parser(t_game *game, char *filename)
 	int		fd;
 	char	*line;
 	char	*temp;
+	int 	size = 1;
+	int 	i = 0;
+
+
+
+	char **map = (char **)malloc(size * sizeof(char *));	
 	fd = open(filename, O_RDONLY);
 	//printf("%d :  test", fd);
 	while (get_next_line(fd, &line) == 1){
-		line  = remove_space(line);
 		temp = line;
-		if(*line == 'R')	printf("Testing res: %d\n",res_parser(game,line));
-		if(*line == 'N'|| (*line == 'S' && *(line+1) == 'O') || *line == 'W' || *line == 'E')
+		line  = remove_space(line);
+		if (*line == 'R')	printf("Testing res: %d\n",res_parser(game,line));
+		else if (*line == 'N'|| (*line == 'S' && *(line+1) == 'O') || *line == 'W' || *line == 'E')
 			printf("Testing texture : %d\n",tex_parser(game, line));
-		else if(*line == 'F' || *line == 'C')
+		else if (*line == 'F' || *line == 'C')
 			printf("Testing color: %d\n",color_parser(game,line));
+		else if (*line != '\n' && *line !='\0')
+		{	
+			map_parser(temp, i, size, &map);
+			printf("temp::::%d ----- %s\n",(i-1), map[i-1]);
+		}
+		free(temp);
 	}
+	map[i] = ft_strdup(line);
+	printf("temp:::: %s\n", map[i]);
+	game->map = map;
 	printf("data width::: %d\n", game->vars.screenWidth);
 	printf("data height::: %d\n", game->vars.screenHeight);
 	printf("data floor-color::: %d\n", game->vars.floor_color);
-	free(temp);
+	free(line);
+	//free(map);
+	printf("map [i][j]: %s\n", game->map[1]);
 	close(fd);
-
 	printf("moti\n\n\n");
 }

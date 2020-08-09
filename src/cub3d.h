@@ -71,11 +71,12 @@ typedef struct  s_game {
     t_player	player;
 	t_texture	textures[4];
 	t_vars		vars;
-	int 		*map[];
+	char 		**map;
 }               t_game;
 
 void	main_parser(t_game *game, char *filename);
 
+int		map_parser(char *line, int i, int size, char ***map);
 int		res_parser(t_game *game, char *line);
 int		check_n_set_res(t_game *game,int screenWidth, int screenHeight);
 

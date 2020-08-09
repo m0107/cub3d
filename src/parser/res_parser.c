@@ -12,20 +12,6 @@
 
 #include "../cub3d.h"
 
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mgupta <marvin@42.fr>                      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/28 20:21:57 by mgupta            #+#    #+#             */
-/*   Updated: 2019/11/05 04:44:20 by mgupta           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-
 // Return 0 if resolution is fine, otherwise Error no;
 int check_n_set_res(t_game *game,int screenWidth, int screenHeight)
 {

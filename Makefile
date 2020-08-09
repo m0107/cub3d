@@ -32,7 +32,7 @@ src/parser/main_parser.c \
 src/parser/tex_parser.c \
 src/parser/res_parser.c \
 src/parser/color_parser.c \
-
+src/parser/map_parser.c \
 
 GNL_SRCS = gnl/get_next_line.c \
 gnl/get_next_line_utils.c \
