@@ -76,7 +76,7 @@ typedef struct  s_game {
 
 void	main_parser(t_game *game, char *filename);
 
-int		map_parser(char *line, int i, int size, char ***map);
+char	**map_parser(char *line, int *i, char **map);
 int		res_parser(t_game *game, char *line);
 int		check_n_set_res(t_game *game,int screenWidth, int screenHeight);
 
