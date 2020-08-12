@@ -2,6 +2,7 @@
 
 NAME = cub3D
 CC = gcc  # C compiler
+# -fsanitize=address
 
 #CFLAGS = -Wall -Werror -Wextra -I. -Ilibft/. -c  # C flags
 CFLAGS =  -Isrc/. -Ilibft/. -Imlx/. -Ignl/. -c  # C flags

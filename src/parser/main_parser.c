@@ -79,7 +79,9 @@ void	main_parser(t_game *game, char *filename)
 		}
 		free(temp);
 	}
-	map[i++] = ft_strdup(line);
+	if(!(map[i++] = ft_strdup(line)))
+		perror("Error: ");
+	printf("map[%d]::: %s\n",(i-1),map[i-1]);
 	game->map = map;
 	printf("data width::: %d\n", game->vars.screenWidth);
 	printf("data height::: %d\n", game->vars.screenHeight);
@@ -89,11 +91,16 @@ void	main_parser(t_game *game, char *filename)
 
 	for (int k = 0; k < i; k++)
 	{
-		printf("%s ----- %d\n", map[k], k);
+		printf("%s ----- %d\n", game->map[k], k);
+	
+	}
+	printf("\n");
+	for (int k = 0; k < i; k++)
+	{
+		printf("%s -map- %d\n", map[k], k);
 	
 	
 	}
-	
 	
 
 	close(fd);

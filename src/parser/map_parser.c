@@ -17,10 +17,10 @@ char	**map_parser(char *line, int *i, char **map)
 	char	**temp_map;
 	int		j;
 
-	(*i)++;
-	temp_map = (char **)malloc(*i * sizeof(char *));
+	if(!(temp_map = (char **)malloc(((*i)+1) * sizeof(char *))))
+		perror("Error: ");
 	j = -1;
-	while (++j < (*i - 1))
+	while (++j < *i)
 		temp_map[j] = map[j];
 	free(map);
 	map = temp_map;
@@ -33,6 +33,8 @@ char	**map_parser(char *line, int *i, char **map)
 			line[j] = '0';
 		j++;
 	}
-	map[(*i) - 1] = ft_strdup(line);
+	if(!(map[*i] = ft_strdup(line)))
+		perror("Error: ");
+	(*i)++;
 	return (map);
 }
