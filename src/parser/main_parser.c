@@ -35,7 +35,7 @@ void mp_helpr(char * line, t_game *game, int *i)
 			printf("Testing color: %d\n",color_parser(game,line));
 		else if (*line != '\n' && *line !='\0'){
 			// printf("line--- %s\n", line);
-			game->map = map_parser(temp, i, game->map);
+			game->map.data = map_parser(temp, i, game->map.data);
 		}
 		free(temp);
 	
@@ -51,9 +51,8 @@ void	main_parser(t_game *game, char *filename)
 	i = 0;
 	fd = open(filename, O_RDONLY);
 	while (get_next_line(fd, &line) == 1)
-	{
 		mp_helpr(line, game, &i);
-	}
 	mp_helpr(line, game, &i);
+	game->map.size = i;
 	close(fd);
 }

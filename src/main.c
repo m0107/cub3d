@@ -116,7 +116,7 @@ void render(t_game *game)
 					side = 1;
 				}
 				//Check if ray has hit a wall
-				if(game->map[mapX][mapY] != '0')
+				if(game->map.data[mapX][mapY] != '0')
 				{ 
 					hit = 1;
 				}
@@ -229,9 +229,9 @@ int             ft_close(int keycode, t_game *game)
 		int xMap = (int)((game->player.posX + game->player.dirX * moveSpeed));
 		int yMap = (int)(game->player.posY);
 		printf("xMap: %d | yMap: %d\n\n", xMap, yMap);
-		if(game->map[xMap][yMap] == '0')
+		if(game->map.data[xMap][yMap] == '0')
 			game->player.posX += game->player.dirX * moveSpeed;
-		if(game->map[(int)(game->player.posX)][(int)((game->player.posY + game->player.dirY * moveSpeed))] == '0')
+		if(game->map.data[(int)(game->player.posX)][(int)((game->player.posY + game->player.dirY * moveSpeed))] == '0')
 			game->player.posY += game->player.dirY * moveSpeed;
 			printf("****game.player.posX:|%f|\n", game->player.posX);
 			printf("****game.player.posY:|%f|\n", game->player.posY);
@@ -241,9 +241,9 @@ int             ft_close(int keycode, t_game *game)
 
 	if(keycode == 1)
 	{
-		if(game->map[(int)(game->player.posX - game->player.dirX * moveSpeed)][(int)game->player.posY] == '0')
+		if(game->map.data[(int)(game->player.posX - game->player.dirX * moveSpeed)][(int)game->player.posY] == '0')
 			game->player.posX -= game->player.dirX * moveSpeed;
-		if(game->map[(int)game->player.posX][(int)(game->player.posY - game->player.dirY * moveSpeed)] == '0')
+		if(game->map.data[(int)game->player.posX][(int)(game->player.posY - game->player.dirY * moveSpeed)] == '0')
 			game->player.posY -= game->player.dirY * moveSpeed;
 			printf("****game.player.posX:|%f|\n", game->player.posX);
 			printf("****game.player.posY:|%f|\n", game->player.posY);
@@ -255,9 +255,9 @@ int             ft_close(int keycode, t_game *game)
 		double tempx = game->player.dirX * cos(-rotSpeed) - game->player.dirY * sin(-rotSpeed);
       	double tempy = oldDirX * sin(-rotSpeed) + game->player.dirY * cos(-rotSpeed);
 
-		if(game->map[(int)(game->player.posX + tempx * moveSpeed)][(int)game->player.posY] == '0')
+		if(game->map.data[(int)(game->player.posX + tempx * moveSpeed)][(int)game->player.posY] == '0')
 			game->player.posX += tempx * moveSpeed;
-		if(game->map[(int)game->player.posX][(int)(game->player.posY + tempy * moveSpeed)] == '0')
+		if(game->map.data[(int)game->player.posX][(int)(game->player.posY + tempy * moveSpeed)] == '0')
 			game->player.posY += tempy * moveSpeed;
 		render(game);
 	}
@@ -269,8 +269,8 @@ int             ft_close(int keycode, t_game *game)
 		double tempx  = game->player.dirX * cos(rotSpeed) - game->player.dirY * sin(rotSpeed);
       	double tempy  = oldDirX * sin(rotSpeed) + game->player.dirY * cos(rotSpeed);
 
-		if(game->map[(int)(game->player.posX - tempx * moveSpeed)][(int)game->player.posY] == '0') game->player.posX -= tempx * moveSpeed;
-		if(game->map[(int)game->player.posX][(int)(game->player.posY - tempy * moveSpeed)] == '0') game->player.posY -= tempy * moveSpeed;
+		if(game->map.data[(int)(game->player.posX - tempx * moveSpeed)][(int)game->player.posY] == '0') game->player.posX -= tempx * moveSpeed;
+		if(game->map.data[(int)game->player.posX][(int)(game->player.posY - tempy * moveSpeed)] == '0') game->player.posY -= tempy * moveSpeed;
 		render(game);
 	}
 	//turn right
@@ -299,9 +299,9 @@ int             ft_close(int keycode, t_game *game)
 	if(keycode == 53)
 	{	
 		mlx_destroy_window(game->vars.mlx, game->vars.win);
-		for(int i=0;i<4;i++)
+		for(int i=0;i<game->map.size;i++)
 		{
-			free(game->map[i]);
+			free(game->map.data[i]);
 		}
 		printf("map freed\n\n");
 		

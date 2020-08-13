@@ -67,11 +67,17 @@ typedef struct	s_texture
 	char			*data;
 }				t_texture;
 
+typedef struct	s_map {
+	char 		**data;
+	int			size;
+	int			read; // 0:not started 1:reading 2:done
+}				t_map;
+
 typedef struct  s_game {
     t_player	player;
 	t_texture	textures[4];
 	t_vars		vars;
-	char 		**map;
+	t_map		map;
 }               t_game;
 
 void	main_parser(t_game *game, char *filename);
