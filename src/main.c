@@ -12,22 +12,7 @@
 
 
 #include "cub3d.h"
-
-
-char worldMap[10][26]=
-{
-	"11111111111111111111111111",
-	"10000000000000000000000001",
-	"10000000000000000000000001",
-	"10000000000000000000000001",
-	"10000000000000000000000001",
-	"10000000000000000000000001",
-	"10000000000000000000000001",
-	"10000000000000000000000001",
-	"10000000000000000000000001",
-	"1111111111111111111111111",
-};
-
+#include "math.h"
 
 void		get_pixel_color(t_texture texture, int x, int y,
 		unsigned char *result)
@@ -76,22 +61,14 @@ void	draw_pixel(t_vars *vars, unsigned int x, unsigned int y,
 void render(t_game *game)
 {
 	printf("inside rendering function\n\n");
-	for(int i = 0;i < 11;i++)
-	{
-		for (int j = 0; j < 25; j++)
-		{
-			printf("%c",game->map[i][j]);
-		}
-		printf("\n");
-	}
 	for(int x = 0; x < game->vars.screenWidth; x++) {
 			//calculate ray position and direction
 			double cameraX = 2 * x / (double)game->vars.screenWidth - 1; //x-coordinate in camera space
 			double rayDirX = game->player.dirX + game->player.planeX * cameraX;
 			double rayDirY = game->player.dirY + game->player.planeY * cameraX;
 			//which box of the map we're in
-			int mapX = (int)game->player.posX;
-			int mapY = (int)game->player.posY;
+			int mapX = (int)(game->player.posX);
+			int mapY = (int)(game->player.posY);
 
 			//length of ray from current position to next x or y-side
 			double sideDistX;
@@ -123,9 +100,11 @@ void render(t_game *game)
 				stepY = 1;
 				sideDistY = (mapY + 1.0 - game->player.posY) * deltaDistY;
 			}
-			printf("Starting dda\n\n");
-			//perform DDA
+			// printf("Starting dda\n\n");
+			// perform DDA
 			while (hit == 0) {
+				
+			
 				//jump to next map square, OR in x-direction, OR in y-direction
 				if (sideDistX < sideDistY) {
 					sideDistX += deltaDistX;
@@ -137,43 +116,50 @@ void render(t_game *game)
 					side = 1;
 				}
 				//Check if ray has hit a wall
-				printf("\n\nmapX--->:|%d|\n", mapX);
-				printf("mapY--->:|%d|\n\n\n", mapY);
-			
+				if(game->map[mapX][mapY] != '0')
+				{ 
+					hit = 1;
+					printf("hit at mapx: %d, mapY:%d\n", mapX, mapY);
+					printf("side: %d\n", side);
+					int trmp;
 				
-				printf("\n\nCheck if ray has hit a wall : %c\n\n", game->map[mapX][mapY]);
-				if(game->map[mapX][mapY] != '0') hit = 1;
+				}
 				
 			}
-			printf("mapX:|%d|\n", mapX);
-			printf("mapY:|%d|\n", mapY);
-			printf("game.player.posX:|%f|\n", game->player.posX);
-			printf("game.player.posY:|%f|\n", game->player.posY);
+			//  printf("game.player.posX:|%f|\n", game->player.posX);
+			//  printf("game.player.posY:|%f|\n", game->player.posY);
 			
-			printf("stepX:|%d|\n", stepX);
-			printf("stepY:|%d|\n", stepY);
+			//  printf("stepX:|%d|\n", stepX);
+			//  printf("stepY:|%d|\n", stepY);
 
 
-			printf("rayDirX:|%f|\n", rayDirX);
-			printf("rayDirY:|%f|\n", rayDirY);
+			// printf("rayDirX:|%f|\n", rayDirX);
+			// printf("rayDirY:|%f|\n", rayDirY);
 			//Calculate distance projected on camera direction (Euclidean distance will give fisheye effect!)
 			if(side == 0) perpWallDist = (mapX - game->player.posX + (1 - stepX) / 2) / rayDirX;
 			else          perpWallDist = (mapY - game->player.posY + (1 - stepY) / 2) / rayDirY;
-			printf("prepWallDist: %f\n\n", perpWallDist);
-			printf("Calculate height of line to draw on screen\n\n");
+		//	 printf("prepWallDist: %f\n\n", perpWallDist);
+			 if (perpWallDist <= 0.0000001f){
+				 printf("*******returning\n\n");
+				 printf("game.player.posX:|%f|\n", game->player.posX);
+				printf("game.player.posY:|%f|\n", game->player.posY);
+			
+			 	return;
+			 }
+		//	 printf("Calculate height of line to draw on screen\n\n");
 			//Calculate height of line to draw on screen
 			int lineHeight = (int)(game->vars.screenHeight / perpWallDist);
-			printf("line height: %d\n\n", lineHeight);
+		//	printf("line height: %d\n\n", lineHeight);
 			//calculate lowest and highest pixel to fill in current stripe
 			int drawStart = -lineHeight / 2 + game->vars.screenHeight / 2;
 			if(drawStart < 0)drawStart = 0;
 			int drawEnd = lineHeight / 2 + game->vars.screenHeight / 2;
-			printf("drawend: %d\n", drawEnd);
+			// printf("drawend: %d\n", drawEnd);
 		
 			if(drawEnd >= game->vars.screenHeight)drawEnd = game->vars.screenHeight - 1;
 
 
-			
+	
 
 			//calculate value of wallX
 			double wallX; //where exactly the wall was hit
@@ -185,26 +171,16 @@ void render(t_game *game)
 			int texX = (int)(wallX * (double)(texWidth));
 			if(side == 0 && rayDirX > 0) texX = texWidth - texX - 1;
 			if(side == 1 && rayDirY < 0) texX = texWidth - texX - 1;
-
-			/*t_texture temp_tex[4];
-			
-			load_texture(game.vars.mlx, "res/bluebrick.xpm", &temp_tex[0]);
-			load_texture(game.vars.mlx, "res/orangebrick.xpm", &temp_tex[1]);
-			load_texture(game.vars.mlx, "res/purplestone.xpm", &temp_tex[2]);
-			load_texture(game.vars.mlx, "res/wall1.xpm", &temp_tex[3]);
-			*/
-			// How much to increase the texture coordinate per screen pixel
 			double step = 1.0 * texHeight / lineHeight;
 			// Starting texture coordinate
 			double texPos = (drawStart - game->vars.screenHeight / 2 + lineHeight / 2) * step;
 			int i;
-			printf("starting drawing\n\n");
 			for(i = 0; i < drawStart; i++)
 			{
 				my_mlx_pixel_put(&game->vars, x, i, game->vars.ceiling_color);
 			}
-			printf("starting drawing 1\n\n");
-			printf("drawend: %d\n", drawEnd);
+		//	printf("starting drawing 1\n\n");
+		//	printf("drawend: %d\n", drawEnd);
 		
 			for(i = drawStart; i < drawEnd; i++)
 			{
@@ -213,75 +189,53 @@ void render(t_game *game)
 				texPos += step;
 				unsigned char color[4];
 				if (side == 0 && rayDirX < 0)
-				{
+				{	//north
 					get_pixel_color(game->textures[0], texX, texY, color);
 					draw_pixel(&game->vars, x, i, color);
-					//my_mlx_pixel_put(&game.vars, x, i, 0x00ff0000);
 				}
 				else if (side == 0 && rayDirX >= 0)
 				{
 					get_pixel_color(game->textures[1], texX, texY, color);
-					draw_pixel(&game->vars, x, i, color);//my_mlx_pixel_put(&game.vars, x, i, 0x000000ff);
+					draw_pixel(&game->vars, x, i, color);
 				}
 				else if (side == 1 && rayDirY < 0)
 				{
 					get_pixel_color(game->textures[2], texX, texY, color);
-					draw_pixel(&game->vars, x, i, color);//my_mlx_pixel_put(&game.vars, x, i, 0x0000ff00);
+					draw_pixel(&game->vars, x, i, color);
 				}
 				else 
 				{
 					get_pixel_color(game->textures[3], texX, texY, color);
-					draw_pixel(&game->vars, x, i, color);//my_mlx_pixel_put(&game.vars, x, i, 0x00f0f012);
+					draw_pixel(&game->vars, x, i, color);
 				}
 			}
-			printf("starting drawing 2\n\n\n");
-			printf("drawend: %d\n", drawEnd);
-			printf("screenHeight: %d\n", game->vars.screenHeight);
 			for(i = drawEnd; i < game->vars.screenHeight; i++)
 			{
 				my_mlx_pixel_put(&game->vars, x, i, game->vars.floor_color);
 			}
-				printf("starting drawing 3\n\n");
-
-			//printf(" value of i in end : %d\n", i);
-			//print_line(game.vars, x, drawStart, drawEnd, color);
-
-			printf("drew 1 line for 1 x\n\n");
 		}
-
-		printf("drawing finished\n\n");
+		// printf("drawing finished\n\n");
 		mlx_put_image_to_window(game->vars.mlx, game->vars.win, game->vars.img.img, 0, 0);	
+		// printf("rendering done\n\n");
 }
 
 int             ft_close(int keycode, t_game *game)
 {
 
-		
-
-				for(int i = 0;i < 11;i++)
-				{
-					for (int j = 0; j < 25; j++)
-					{
-						printf("%c",game->map[i][j]);
-					}
-					printf("\n");
-				}
-		//speed modifiers
-		double moveSpeed = 0.1; //the constant value is in squares/second
-		double rotSpeed = 0.1; //the constant value is in radians/second
-		//printf("pos x: %f | y: %f\n", game->player.posX, game->player.posY);
-		
-		
-		
-	
-     // if(worldMap[(int)(game->player.posX + game->player.dirX * 0.1)][(int)game->player.posY] == 0) game->player.posX += game->player.dirX * moveSpeed;
-      //if(worldMap[(int)game->player.posX][(int)(game->player.posY + game->player.dirY * moveSpeed)] == 0) game->player.posY += game->player.dirY * moveSpeed;
-    
+	//speed modifiers
+	double moveSpeed = 0.1; //the constant value is in squares/second
+	double rotSpeed = 0.0872665;
+	//double rotSpeed = 0.0872665; //the constant value is in radians/second
+	printf("pos x: %f | y: %f\n", game->player.posX, game->player.posY);
+	printf("keycode: %d******\n\n\n", keycode);
 	if(keycode == 13)
 	{		
-		if(game->map[(int)(game->player.posX + game->player.dirX * moveSpeed)][(int)game->player.posY] == '0')
+		int xMap = (int)((game->player.posX + game->player.dirX * moveSpeed));
+		int yMap = (int)(game->player.posY);
+		printf("xMap: %d | yMap: %d\n\n", xMap, yMap);
+		if(game->map[xMap][yMap] == '0')
 			game->player.posX += game->player.dirX * moveSpeed;
-		if(game->map[(int)game->player.posX][(int)(game->player.posY + game->player.dirY * moveSpeed)] == '0')
+		if(game->map[(int)ceil(game->player.posX)][(int)(ceil(game->player.posY + game->player.dirY * moveSpeed))] == '0')
 			game->player.posY += game->player.dirY * moveSpeed;
 		render(game);
 	}
@@ -292,9 +246,9 @@ int             ft_close(int keycode, t_game *game)
 			game->player.posX -= game->player.dirX * moveSpeed;
 		if(game->map[(int)game->player.posX][(int)(game->player.posY - game->player.dirY * moveSpeed)] == '0')
 			game->player.posY -= game->player.dirY * moveSpeed;
+			 printf("****game.player.posX:|%f|\n", game->player.posX);
+				printf("****game.player.posY:|%f|\n", game->player.posY);
 		render(game);
-	//	if(worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) posX -= dirX * moveSpeed;
-    //  if(worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) posY -= dirY * moveSpeed;
 	}
 	if (keycode == 2)
 	{  	rotSpeed = 1.5708;
@@ -302,8 +256,10 @@ int             ft_close(int keycode, t_game *game)
 		double tempx = game->player.dirX * cos(-rotSpeed) - game->player.dirY * sin(-rotSpeed);
       	double tempy = oldDirX * sin(-rotSpeed) + game->player.dirY * cos(-rotSpeed);
 
-		if(game->map[(int)(game->player.posX + tempx * moveSpeed)][(int)game->player.posY] == '0') game->player.posX += tempx * moveSpeed;
-		if(game->map[(int)game->player.posX][(int)(game->player.posY + tempy * moveSpeed)] == '0') game->player.posY += tempy * moveSpeed;
+		if(game->map[(int)(game->player.posX + tempx * moveSpeed)][(int)game->player.posY] == '0')
+			game->player.posX += tempx * moveSpeed;
+		if(game->map[(int)game->player.posX][(int)(game->player.posY + tempy * moveSpeed)] == '0')
+			game->player.posY += tempy * moveSpeed;
 		render(game);
 	}
 
@@ -317,14 +273,10 @@ int             ft_close(int keycode, t_game *game)
 		if(game->map[(int)(game->player.posX - tempx * moveSpeed)][(int)game->player.posY] == '0') game->player.posX -= tempx * moveSpeed;
 		if(game->map[(int)game->player.posX][(int)(game->player.posY - tempy * moveSpeed)] == '0') game->player.posY -= tempy * moveSpeed;
 		render(game);
-	//	if(worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) posX -= dirX * moveSpeed;
-    //  if(worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) posY -= dirY * moveSpeed;
 	}
 	//turn right
 	if(keycode == 124)
     {
-      //both camera direction and camera plane must be rotated
-	  
       double oldDirX = game->player.dirX;
       game->player.dirX = game->player.dirX * cos(-rotSpeed) - game->player.dirY * sin(-rotSpeed);
       game->player.dirY = oldDirX * sin(-rotSpeed) + game->player.dirY * cos(-rotSpeed);
@@ -336,7 +288,6 @@ int             ft_close(int keycode, t_game *game)
     //rotate to the left
     if(keycode == 123)
     {
-      //both camera direction and camera plane must be rotated
       double oldDirX = game->player.dirX;
       game->player.dirX = game->player.dirX * cos(rotSpeed) - game->player.dirY * sin(rotSpeed);
       game->player.dirY = oldDirX * sin(rotSpeed) + game->player.dirY * cos(rotSpeed);
@@ -349,12 +300,12 @@ int             ft_close(int keycode, t_game *game)
 	if(keycode == 53)
 	{	
 		mlx_destroy_window(game->vars.mlx, game->vars.win);
-		// for(int i=0;i<11;i++)
-		// {
-		// 	free(game->map[i]);
-		// }
+		for(int i=0;i<4;i++)
+		{
+			free(game->map[i]);
+		}
 		printf("map freed\n\n");
-		exit(1);
+		
 	}
 	return (1);
 }
@@ -363,8 +314,8 @@ int             ft_close(int keycode, t_game *game)
 int             main(int argc, char *argv[])
 {
 	t_game		game; 
-	game.player.posX = 5;
-	game.player.posY = 5;  //x and y start position
+	game.player.posX = 6.5; //row no, starting from 0
+	game.player.posY = 4.5;  //Column no starting from 0
 	game.player.dirX = 1; 
 	game.player.dirY = 0; //initial direction vector
 	
@@ -374,17 +325,7 @@ int             main(int argc, char *argv[])
 	
 	game.vars.mlx = mlx_init();
 	main_parser(&game, argv[1]);
-	printf("Inside main\n");
-	for(int i = 0;i < 11;i++)
-	{
-		for (int j = 0; j < 25; j++)
-		{
-			printf("%c",game.map[i][j]);
-		}
-		printf("\n");
-	}
-	int temp;
-	scanf("%d", &temp);
+	
 	game.vars.win = mlx_new_window(game.vars.mlx, game.vars.screenWidth, game.vars.screenHeight, "Hello world!");
 	//mlx_win = mlx_new_window(mlx, 1920, 1080, "Hello world!");
     game.vars.img.img = mlx_new_image(game.vars.mlx, 1920, 1080);

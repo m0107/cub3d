@@ -18,7 +18,7 @@ char	**map_parser(char *line, int *i, char **map)
 	int		j;
 
 	if(!(temp_map = (char **)malloc(((*i)+1) * sizeof(char *))))
-		perror("Error: ");
+		perror("Error: perror");
 	j = -1;
 	while (++j < *i)
 		temp_map[j] = map[j];
@@ -28,13 +28,14 @@ char	**map_parser(char *line, int *i, char **map)
 	while (line[j] != '\0')
 	{
 		if (line[j] == ' ')
-			line[j] = '$';
+			line[j] = '.';
 		else if (line[j] == 'N')
 			line[j] = '0';
 		j++;
 	}
-	if(!(map[*i] = ft_strdup(line)))
-		perror("Error: ");
+	char *str = ft_strdup(line);
+	printf("str:  %s, i: %d\n", str, *i);
+	map[*i] = str;
 	(*i)++;
 	return (map);
 }

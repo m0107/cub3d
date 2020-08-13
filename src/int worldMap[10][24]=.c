@@ -49,3 +49,15 @@ stepY:|-1|
 rayDirX:|-1.000000|
 rayDirY:|-0.658625|
 prepWallDist: 4.000000
+
+
+drawend: 507
+hit at mapx: 7, mapY:4
+side: 0
+game.player.posX:|6.600000|
+game.player.posY:|4.500000|
+stepX:|1|
+stepY:|-1|
+rayDirX:|1.000000|
+rayDirY:|-0.657770|
+prepWallDist: 0.400000

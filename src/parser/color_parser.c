@@ -21,6 +21,41 @@ int		create_trgb(int t, int r, int g, int b)
 	return(t << 24 | r << 16 | g << 8 | b);
 }
 
+int	checkno_cub(long ans, int sign)
+{
+	if (sign > 0 && ans > 2147483647)
+		return (-1);
+	else if (sign < 0 && ans > 2147483648)
+		return (0);
+	return (ans * sign);
+}
+
+int	ft_atoi_cub(char **str)
+{
+	long	sign;
+	long	ans;
+	ans = 0;
+	sign = 1;
+	while (**str == '\t' || **str == '\n' || **str == '\v'
+			|| **str == '\f' || **str == '\r' || **str == ' ')
+		(*str)++;
+	if (**str == '-' || **str == '+')
+	{
+		if (**str == '-')
+			sign = -1;
+		(*str)++;
+	}
+	while (**str >= '0' && **str <= '9')
+	{
+		ans = ans * 10 + (**str - 48);
+		if (ans > 21474836470)
+			break ;
+		(*str)++;
+	}
+	return (checkno_cub(ans, sign));
+}
+
+
 
 int		color_parser(t_game *game, char *line)
 {
