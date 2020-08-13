@@ -119,10 +119,6 @@ void render(t_game *game)
 				if(game->map[mapX][mapY] != '0')
 				{ 
 					hit = 1;
-					printf("hit at mapx: %d, mapY:%d\n", mapX, mapY);
-					printf("side: %d\n", side);
-					int trmp;
-				
 				}
 				
 			}
@@ -235,8 +231,11 @@ int             ft_close(int keycode, t_game *game)
 		printf("xMap: %d | yMap: %d\n\n", xMap, yMap);
 		if(game->map[xMap][yMap] == '0')
 			game->player.posX += game->player.dirX * moveSpeed;
-		if(game->map[(int)ceil(game->player.posX)][(int)(ceil(game->player.posY + game->player.dirY * moveSpeed))] == '0')
+		if(game->map[(int)(game->player.posX)][(int)((game->player.posY + game->player.dirY * moveSpeed))] == '0')
 			game->player.posY += game->player.dirY * moveSpeed;
+			printf("****game.player.posX:|%f|\n", game->player.posX);
+			printf("****game.player.posY:|%f|\n", game->player.posY);
+
 		render(game);
 	}
 
@@ -246,8 +245,8 @@ int             ft_close(int keycode, t_game *game)
 			game->player.posX -= game->player.dirX * moveSpeed;
 		if(game->map[(int)game->player.posX][(int)(game->player.posY - game->player.dirY * moveSpeed)] == '0')
 			game->player.posY -= game->player.dirY * moveSpeed;
-			 printf("****game.player.posX:|%f|\n", game->player.posX);
-				printf("****game.player.posY:|%f|\n", game->player.posY);
+			printf("****game.player.posX:|%f|\n", game->player.posX);
+			printf("****game.player.posY:|%f|\n", game->player.posY);
 		render(game);
 	}
 	if (keycode == 2)
@@ -314,14 +313,14 @@ int             ft_close(int keycode, t_game *game)
 int             main(int argc, char *argv[])
 {
 	t_game		game; 
-	game.player.posX = 6.5; //row no, starting from 0
-	game.player.posY = 4.5;  //Column no starting from 0
-	game.player.dirX = 1; 
+	game.player.posX = 11.5; //row no, starting from 0
+	game.player.posY = 26.5;  //Column no starting from 0
+	game.player.dirX = -1; 
 	game.player.dirY = 0; //initial direction vector
 	
 	// plane according to intial direction vector
 	game.player.planeX = 0; 
-	game.player.planeY = -0.66; //the 2d raycaster version of camera plane
+	game.player.planeY = 0.66; //the 2d raycaster version of camera plane
 	
 	game.vars.mlx = mlx_init();
 	main_parser(&game, argv[1]);

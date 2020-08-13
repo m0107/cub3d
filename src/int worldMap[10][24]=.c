@@ -29,6 +29,18 @@ char worldMap[10][26]=
 
 
 
+North: 
+	tex: 	if(*line == 'N') //orangebrick
+				i = 0;
+			else if(*line == 'S') //wall1.xpm
+				i = 1;
+			else if(*line == 'W') //bluebrick.xpm
+				i = 2;
+			else if(*line == 'E') //wall3
+				i = 3;
+	
+
+
 mapX:|5|
 mapY:|4|
 game.player.posX:|5.000000|
