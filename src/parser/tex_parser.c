@@ -10,49 +10,43 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
-
 #include "../cub3d.h"
-// Return 0 if resolution is fine, otherwise Error no;
-int	tex_parser(t_game *game, char *line)
+
+void	tex_parser(t_game *game, char *line)
 {
 	int i;
-	
+
 	i = 0;
-	if(*line == 'N')
+	if (game->map.size > 0)
+		printf_error("Input order incorrect.\n");
+	if (*line == 'N')
 		i = 0;
-	else if(*line == 'S')
+	else if (*line == 'S')
 		i = 1;
-	else if(*line == 'W')
+	else if (*line == 'W')
 		i = 2;
-	else if(*line == 'E')
+	else if (*line == 'E')
 		i = 3;
 	else
-		return (-2);
+		printf_error("Invalid texture file");
 	line = line + 2;
-	return(load_texture(game->vars.mlx, remove_space(line), &game->textures[i]));
+	load_texture(game->vars.mlx, remove_space(line), &game->textures[i]);
+	game->parsCheck[i + 1]++;
 }
 
-// Return 0 if resolution is fine, otherwise Error no;
-int	load_texture(void *mlx_ptr, char *filename, t_texture *res)
+void	load_texture(void *mlx_ptr, char *filename, t_texture *res)
 {
-	printf("filename: %s\n", filename);
-	int			config[3];
-	
+	int	config[3];
+
 	res->ptr = mlx_xpm_file_to_image(mlx_ptr, filename,
 			&(res->width), &(res->height));
-	if (res->ptr == 0){
-		printf("Not able to read\n");
-		return (-2);
-	}
+	if (res->ptr == 0)
+		printf_error("Not able to read\n");
 	config[0] = 32;
 	config[1] = res->width * 4;
 	config[2] = 0;
 	res->data = mlx_get_data_addr(res->ptr,
 			&config[0], &config[1], &config[2]);
-	if (res->data == 0){
-		printf("reading failed\n");
-		return (-2);
-	}
-	return 0;
+	if (res->data == 0)
+		printf_error("reading failed\n");
 }

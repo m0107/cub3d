@@ -12,27 +12,37 @@
 
 #include "../cub3d.h"
 
-// Return 0 if resolution is fine, otherwise Error no;
-int check_n_set_res(t_game *game,int screenWidth, int screenHeight)
+void	check_n_set_res(t_game *game, int screenwidth, int screenheight)
 {
-	if(screenWidth > 2560)	screenWidth = 2560;
-	if(screenHeight > 1440) screenHeight = 1440;
-	if(screenHeight <= 0 || screenHeight <= 0) 
-		return (-1);
-	game->vars.screenHeight = screenHeight;
-	game->vars.screenWidth = screenWidth;
-	return (0);
+	if (screenwidth > 2560 || screenwidth == -942514)
+		screenwidth = 2560;
+	if (screenheight > 1440 || screenheight == -942514)
+		screenheight = 1440;
+	
+	if(screenwidth <= 0 || screenheight <= -1)
+		printf_error("Invalid Resolution\n");
+	
+	game->vars.screenheight = screenheight;
+	game->vars.screenwidth = screenwidth;
 }
 
-// Resolution parser Return 0 if resolution is fine, otherwise Error no;
-int	res_parser(t_game *game, char *line)
+void	res_parser(t_game *game, char *line)
 {
-	int	screenWidth;
-	int	screenHeight;
+	int	screenwidth;
+	int	screenheight;
 	int	loop_len;
 
+	if (game->map.size > 0)
+		printf_error("Input order incorrect.\n");
 	line = line + 2;
-	screenWidth = ft_atoi_cub(&line);
-	screenHeight = ft_atoi_cub(&line);
-	return (check_n_set_res(game, screenWidth, screenHeight));
+	screenwidth = ft_atoi_cub(&line);
+	screenheight = ft_atoi_cub(&line);
+	while (*line != '\0' && *line != 0 )
+	{
+		if(*line != ' ')
+			printf_error("Extra input in resolution\n");
+		line++;
+	}
+	check_n_set_res(game, screenwidth, screenheight);
+	game->parsCheck[0]++;
 }

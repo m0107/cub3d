@@ -50,7 +50,7 @@ void	draw_pixel(t_vars *vars, unsigned int x, unsigned int y,
 	int index;
 	int	i;
 
-	if (x >= vars->screenWidth || y >= vars->screenHeight)
+	if (x >= vars->screenwidth || y >= vars->screenheight)
 		return ;
 	index = x * 4 + (y * vars->img.line_length);
 	i = -1;
@@ -61,9 +61,9 @@ void	draw_pixel(t_vars *vars, unsigned int x, unsigned int y,
 void render(t_game *game)
 {
 	printf("inside rendering function\n\n");
-	for(int x = 0; x < game->vars.screenWidth; x++) {
+	for(int x = 0; x < game->vars.screenwidth; x++) {
 			//calculate ray position and direction
-			double cameraX = 2 * x / (double)game->vars.screenWidth - 1; //x-coordinate in camera space
+			double cameraX = 2 * x / (double)game->vars.screenwidth - 1; //x-coordinate in camera space
 			double rayDirX = game->player.dirX + game->player.planeX * cameraX;
 			double rayDirY = game->player.dirY + game->player.planeY * cameraX;
 			//which box of the map we're in
@@ -144,15 +144,15 @@ void render(t_game *game)
 			 }
 		//	 printf("Calculate height of line to draw on screen\n\n");
 			//Calculate height of line to draw on screen
-			int lineHeight = (int)(game->vars.screenHeight / perpWallDist);
+			int lineHeight = (int)(game->vars.screenheight / perpWallDist);
 		//	printf("line height: %d\n\n", lineHeight);
 			//calculate lowest and highest pixel to fill in current stripe
-			int drawStart = -lineHeight / 2 + game->vars.screenHeight / 2;
+			int drawStart = -lineHeight / 2 + game->vars.screenheight / 2;
 			if(drawStart < 0)drawStart = 0;
-			int drawEnd = lineHeight / 2 + game->vars.screenHeight / 2;
+			int drawEnd = lineHeight / 2 + game->vars.screenheight / 2;
 			// printf("drawend: %d\n", drawEnd);
 		
-			if(drawEnd >= game->vars.screenHeight)drawEnd = game->vars.screenHeight - 1;
+			if(drawEnd >= game->vars.screenheight)drawEnd = game->vars.screenheight - 1;
 
 
 	
@@ -169,7 +169,7 @@ void render(t_game *game)
 			if(side == 1 && rayDirY < 0) texX = texWidth - texX - 1;
 			double step = 1.0 * texHeight / lineHeight;
 			// Starting texture coordinate
-			double texPos = (drawStart - game->vars.screenHeight / 2 + lineHeight / 2) * step;
+			double texPos = (drawStart - game->vars.screenheight / 2 + lineHeight / 2) * step;
 			int i;
 			for(i = 0; i < drawStart; i++)
 			{
@@ -205,7 +205,7 @@ void render(t_game *game)
 					draw_pixel(&game->vars, x, i, color);
 				}
 			}
-			for(i = drawEnd; i < game->vars.screenHeight; i++)
+			for(i = drawEnd; i < game->vars.screenheight; i++)
 			{
 				my_mlx_pixel_put(&game->vars, x, i, game->vars.floor_color);
 			}
@@ -299,6 +299,7 @@ int             ft_close(int keycode, t_game *game)
 	if(keycode == 53)
 	{	
 		mlx_destroy_window(game->vars.mlx, game->vars.win);
+		printf("map size: %d", game->map.size);
 		for(int i=0;i<game->map.size;i++)
 		{
 			free(game->map.data[i]);
@@ -313,8 +314,7 @@ int             ft_close(int keycode, t_game *game)
 int             main(int argc, char *argv[])
 {
 	t_game		game; 
-	game.player.posX = 11.5; //row no, starting from 0
-	game.player.posY = 26.5;  //Column no starting from 0
+	
 	game.player.dirX = -1; 
 	game.player.dirY = 0; //initial direction vector
 	
@@ -324,8 +324,11 @@ int             main(int argc, char *argv[])
 	
 	game.vars.mlx = mlx_init();
 	main_parser(&game, argv[1]);
+	printf("posX: %f\n", game.player.posX);
+	printf("posY: %f\n", game.player.posY);
 	
-	game.vars.win = mlx_new_window(game.vars.mlx, game.vars.screenWidth, game.vars.screenHeight, "Hello world!");
+	
+	game.vars.win = mlx_new_window(game.vars.mlx, game.vars.screenwidth, game.vars.screenheight, "Hello world!");
 	//mlx_win = mlx_new_window(mlx, 1920, 1080, "Hello world!");
     game.vars.img.img = mlx_new_image(game.vars.mlx, 1920, 1080);
     game.vars.img.addr = mlx_get_data_addr(game.vars.img.img, &game.vars.img.bits_per_pixel, &game.vars.img.line_length,

@@ -49,8 +49,8 @@ typedef struct  s_data {
 }               t_data;
 
 typedef struct  s_vars {
-	int			screenWidth;
-	int			screenHeight;
+	int			screenwidth;
+	int			screenheight;
 	int			floor_color;
 	int			ceiling_color;
 	void        *mlx;
@@ -70,10 +70,10 @@ typedef struct	s_texture
 typedef struct	s_map {
 	char 		**data;
 	int			size;
-	int			read; // 0:not started 1:reading 2:done
 }				t_map;
 
 typedef struct  s_game {
+	int			parsCheck[9];
     t_player	player;
 	t_texture	textures[4];
 	t_vars		vars;
@@ -82,18 +82,22 @@ typedef struct  s_game {
 
 void	main_parser(t_game *game, char *filename);
 
-char	**map_parser(char *line, int *i, char **map);
-int		res_parser(t_game *game, char *line);
-int		check_n_set_res(t_game *game,int screenWidth, int screenHeight);
+void	map_parser(t_game *game, char *line);
+void	res_parser(t_game *game, char *line);
+void	check_n_set_res(t_game *game,int screenWidth, int screenHeight);
 
-int		tex_parser(t_game *game, char *line);
-int		load_texture(void *mlx_ptr, char *filename, t_texture *res);
+void	tex_parser(t_game *game, char *line);
+void	load_texture(void *mlx_ptr, char *filename, t_texture *res);
 
-int		color_parser(t_game *game, char *line);
+void	color_parser(t_game *game, char *line);
 
 
 int		checkno_cub(long ans, int sign);
 int		ft_atoi_cub(char **str);
+
 char	*remove_space(char *line);
+
+void	printf_error(char *error);
+
 
 #endif

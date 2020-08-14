@@ -29,11 +29,14 @@ ft_lstsize.c \
 
 #include all your main .c files here
 SRCS = ./src/main.c \
+src/error.c \
 src/parser/main_parser.c \
 src/parser/tex_parser.c \
 src/parser/res_parser.c \
 src/parser/color_parser.c \
 src/parser/map_parser.c \
+src/utils/ft_atoi_cub.c \
+src/utils/space.c \
 
 GNL_SRCS = gnl/get_next_line.c \
 gnl/get_next_line_utils.c \
