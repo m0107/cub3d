@@ -60,7 +60,7 @@ void	load_texture(void *mlx_ptr, char *filename, t_texture *res)
 	res->ptr = mlx_xpm_file_to_image(mlx_ptr, filename,
 			&(res->width), &(res->height));
 	if (res->ptr == 0){
-		printf("Not able to read");
+		printf("Not able to read Texture");
 	}
 	config[0] = 32;
 	config[1] = res->width * 4;
@@ -68,7 +68,7 @@ void	load_texture(void *mlx_ptr, char *filename, t_texture *res)
 	res->data = mlx_get_data_addr(res->ptr,
 			&config[0], &config[1], &config[2]);
 	if (res->data == 0)
-		printf("reading failed");
+		printf("texture reading failed");
 }
 
 void            my_mlx_pixel_put(t_vars *vars, int x, int y, int color)

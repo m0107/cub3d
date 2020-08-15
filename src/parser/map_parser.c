@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../cub3d.h"
+#include <stdio.h>
 
 int		is_direction(char c)
 {
@@ -38,14 +39,23 @@ void	map_parser(t_game *game,char *line)
 	char	**temp_map;
 	int		j;
 
+	
 	if (!(temp_map = (char **)malloc((game->map.size+1) * sizeof(char *))))
 		printf_error("malloc map failed.\n");
 	j = -1;
+	
+	printf("mohit 1\n\n");
+	printf("J value: %d\n", j);
+	printf("game->map.size:%d\n",game->map.size);
 	while (++j < game->map.size)
 		temp_map[j] = game->map.data[j];
-	free(game->map.data);
+	printf("mohit 1.5\n\n");
+	if (game->map.size > 0)
+		free(game->map.data);
+	printf("mohit 2\n\n");
 	game->map.data = temp_map;
 	j = 0;
+	printf("mohit\n\n");
 	while (line[j] != '\0')
 	{
 		if (is_direction(line[j]))

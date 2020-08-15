@@ -219,27 +219,24 @@ int             ft_close(int keycode, t_game *game)
 {
 
 	//speed modifiers
-	double moveSpeed = 0.1; //the constant value is in squares/second
+	double moveSpeed = 0.15; //the constant value is in squares/second
 	double rotSpeed = 0.0872665;
 	//double rotSpeed = 0.0872665; //the constant value is in radians/second
-	printf("pos x: %f | y: %f\n", game->player.posX, game->player.posY);
+	//printf("pos x: %f | y: %f\n", game->player.posX, game->player.posY);
 	printf("keycode: %d******\n\n\n", keycode);
-	if(keycode == 13)
+	//forward
+	if(keycode == 119)
 	{		
 		int xMap = (int)((game->player.posX + game->player.dirX * moveSpeed));
 		int yMap = (int)(game->player.posY);
-		printf("xMap: %d | yMap: %d\n\n", xMap, yMap);
 		if(game->map.data[xMap][yMap] == '0')
 			game->player.posX += game->player.dirX * moveSpeed;
 		if(game->map.data[(int)(game->player.posX)][(int)((game->player.posY + game->player.dirY * moveSpeed))] == '0')
 			game->player.posY += game->player.dirY * moveSpeed;
-			printf("****game.player.posX:|%f|\n", game->player.posX);
-			printf("****game.player.posY:|%f|\n", game->player.posY);
-
 		render(game);
 	}
-
-	if(keycode == 1)
+	//back
+	if(keycode == 115)
 	{
 		if(game->map.data[(int)(game->player.posX - game->player.dirX * moveSpeed)][(int)game->player.posY] == '0')
 			game->player.posX -= game->player.dirX * moveSpeed;
@@ -249,7 +246,8 @@ int             ft_close(int keycode, t_game *game)
 			printf("****game.player.posY:|%f|\n", game->player.posY);
 		render(game);
 	}
-	if (keycode == 2)
+	//ritgh
+	if (keycode == 100)
 	{  	rotSpeed = 1.5708;
 		double oldDirX = game->player.dirX;
 		double tempx = game->player.dirX * cos(-rotSpeed) - game->player.dirY * sin(-rotSpeed);
@@ -262,7 +260,7 @@ int             ft_close(int keycode, t_game *game)
 		render(game);
 	}
 
-	if(keycode == 0)
+	if(keycode == 97)
 	{	
 		rotSpeed = -1.5708;
 		double oldDirX = game->player.dirX;
@@ -274,7 +272,7 @@ int             ft_close(int keycode, t_game *game)
 		render(game);
 	}
 	//turn right
-	if(keycode == 124)
+	if(keycode == 65363)
     {
       double oldDirX = game->player.dirX;
       game->player.dirX = game->player.dirX * cos(-rotSpeed) - game->player.dirY * sin(-rotSpeed);
@@ -285,7 +283,7 @@ int             ft_close(int keycode, t_game *game)
 	  render(game);
     }
     //rotate to the left
-    if(keycode == 123)
+    if(keycode == 65361)
     {
       double oldDirX = game->player.dirX;
       game->player.dirX = game->player.dirX * cos(rotSpeed) - game->player.dirY * sin(rotSpeed);
@@ -296,7 +294,7 @@ int             ft_close(int keycode, t_game *game)
 	  render(game);
     }
 
-	if(keycode == 53)
+	if(keycode == 65307)
 	{	
 		mlx_destroy_window(game->vars.mlx, game->vars.win);
 		printf("map size: %d", game->map.size);
@@ -336,6 +334,7 @@ int             main(int argc, char *argv[])
 	//print_line(vars);	
 		render(&game);
 		mlx_hook(game.vars.win, 2, 1L<<0, ft_close, &game);
+		//mlx_key_hook(game.vars.win,ft_close, &game);
 		mlx_loop(game.vars.mlx);
 	return 0;
 }

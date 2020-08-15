@@ -1,11 +1,15 @@
 # Makefile template for a shared library in C
 
+
+CC=gcc
+
+
 NAME = cub3D
 CC = gcc  # C compiler
 # -fsanitize=address
 
 #CFLAGS = -Wall -Werror -Wextra -I. -Ilibft/. -c  # C flags
-CFLAGS =  -Isrc/. -Ilibft/. -Imlx/. -Ignl/. -c  # C flags
+CFLAGS =  -Isrc -Ilibft -Imlx -Ignl -I/usr/include -O3# C flags
 
 RM = rm -f   # rm command
 LIBFT_DIR	=	./libft
@@ -46,7 +50,7 @@ GNL_OBJS = $(GNL_SRCS:.c=.o)
 OBJS = $(SRCS:.c=.o)
 
 
-all:  $(MLX) $(LIBFT)  $(NAME)
+all:  $(LIBFT)  $(NAME)
 	@printf "Makefile starts\n"
 
 gnl/%.o: gnl/%.c
@@ -62,15 +66,15 @@ $(LIBFT):
 
 $(NAME): $(OBJS) $(GNL_OBJS)
 	@printf "$(OBJS)\n"
-	$(CC) -Isrc -Imlx -Ilibft -Ignl -o $@ $^ -Lmlx -lmlx -framework OPENGL -framework Appkit -lm -Llibft -lft
+	$(CC) $(CFLAGS) $^ -o $@  -Lmlx -lmlx -L/usr/include/lib -lXext -lX11 -lm -lbsd  -Llibft -lft
 
 
 src/%.o: src/%.c
-	$(CC) -Ignl -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 
 src/parser/%.o: src/parser/%.c
-	$(CC) -Ignl -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 
 #$(B_OBJS):$(B_SRCS)

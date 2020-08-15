@@ -1,20 +1,16 @@
-R    900     600   
+R    500     300   
 
-NO /Users/mgupta/42/Cube3d/mgupta/res/wall1.xpm
+NO      ./res/orangebrick.xpm
 
-SO /Users/mgupta/42/Cube3d/mgupta/res/bluebrick.xpm
-WE      /Users/mgupta/42/Cube3d/mgupta/res/wall1.xpm
+SO ./res/bluebrick.xpm
+WE  ./res/wall1.xpm
 
 C    100, 0025   , 0    
 
-EA /Users/mgupta/42/Cube3d/mgupta/res/orangebrick.xpm
+EA ./res/orangebrick.xpm
 
 
 F 220,   100,0
-
-
-
-
 
 
 

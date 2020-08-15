@@ -10,12 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./cub3d.h"
+#include "cub3d.h"
 
 void	printf_error(char *error)
 {
 	perror("Error\n");
-	ft_putstr_fd(": ", 1);
-	ft_putstr_fd(error, 1);
+	printf("%s\n",error);
+	//ft_putstr_fd(": ", 1);
+	//ft_putstr_fd(error, 1);
 	exit(0);
 }

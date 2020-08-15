@@ -17,7 +17,7 @@ char	*ft_strjoin(char *s1, char const *s2)
 	char	*ans;
 	int		len;
 
-	len = ft_strlen(s1) + ft_strlen(s2);
+	len = ft_strlen_1(s1) + ft_strlen_1(s2);
 	if (!(ans = (char *)malloc(len + 1)))
 		return (NULL);
 	while (*s1)
@@ -31,7 +31,7 @@ char	*ft_strjoin(char *s1, char const *s2)
 int		checkerror(int fd, char **str, char **line)
 {
 	if (fd < 0 || line == NULL
-	|| fd > OPEN_MAX || read(fd, *str, 0) == -1 || BUFFER_SIZE < 1)
+	|| fd > FOPEN_MAX || read(fd, *str, 0) == -1 || BUFFER_SIZE < 1)
 	{
 		return (-1);
 	}
@@ -96,7 +96,7 @@ int		get_next_line(int const fd, char **line)
 		i++;
 	*line = (i == 0) ? ft_strdup("") : ft_strsub(str, 0, i);
 	temp = str;
-	str = ft_strsub(temp, i + 1, ft_strlen(temp) - i);
+	str = ft_strsub(temp, i + 1, ft_strlen_1(temp) - i);
 	free(temp);
 	temp = NULL;
 	if (ret == 0 && !check_newl(str))

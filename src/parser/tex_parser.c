@@ -37,16 +37,15 @@ void	tex_parser(t_game *game, char *line)
 void	load_texture(void *mlx_ptr, char *filename, t_texture *res)
 {
 	int	config[3];
-
 	res->ptr = mlx_xpm_file_to_image(mlx_ptr, filename,
 			&(res->width), &(res->height));
 	if (res->ptr == 0)
-		printf_error("Not able to read\n");
+		printf_error("Not able to read Texture\n");
 	config[0] = 32;
 	config[1] = res->width * 4;
 	config[2] = 0;
 	res->data = mlx_get_data_addr(res->ptr,
 			&config[0], &config[1], &config[2]);
 	if (res->data == 0)
-		printf_error("reading failed\n");
+		printf_error(" Texture reading failed\n");
 }

@@ -17,7 +17,7 @@ void	mp_helpr(char * line, t_game *game)
 {
 
 		char	*temp;
-		
+		printf("line: %s\n", line);
 		temp = line;
 		line  = remove_space(line);
 		if (*line == 'R')
@@ -77,11 +77,13 @@ void	main_parser(t_game *game, char *filename)
 	char	*line;
 	char	**map;
 
+	printf("parsing starting\n");
 	init_pars_check(game);
 	if ((fd = open(filename, O_RDONLY)) < 1)
 		printf_error("invalid filepath\n");
 	while ((t = get_next_line(fd, &line)) == 1)
 		mp_helpr(line, game);
+	printf("parsing done\n");
 	game->parsCheck[8]++;
 	pars_check_result(game);
 	if	(t < 0)
