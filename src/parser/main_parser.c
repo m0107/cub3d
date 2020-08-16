@@ -17,7 +17,6 @@ void	mp_helpr(char * line, t_game *game)
 {
 
 		char	*temp;
-		printf("line: %s\n", line);
 		temp = line;
 		line  = remove_space(line);
 		if (*line == 'R')
@@ -26,10 +25,12 @@ void	mp_helpr(char * line, t_game *game)
 			tex_parser(game, line);
 		else if (*line == 'F' || *line == 'C')
 			color_parser(game,line);
+		else if (*line == 'S')
+			sprite_parser(game,line);
 		else if (*line != '\n' && *line !='\0')
 			map_parser(game, temp);
-		else if(game->map.size > 0)
-			printf_error("Empty line in Map.\n");
+		else if(game->map.size > 0 && *temp != ' ')
+			printf_error("Empty line in Map.\n", game);
 		free(temp);
 	
 }
@@ -44,30 +45,33 @@ void	init_pars_check(t_game *game)
 		game->parsCheck[i] = -1;
 	}
 	game->map.size = 0;
-	game->parsCheck[5] = 0; // temp :: needed to be removed after implementaion of sprite
+	game->player.posX = -1;
+	game->player.posY = -1;
 }
 
 void pars_check_result(t_game *game)
 {
 
-	if(game->parsCheck[0] != 0)
-		printf_error("Error in input, Resolution missing or double.\n");
-	if(game->parsCheck[1] != 0)
-		printf_error("Error in input, North Texture missing or double.\n");
-	if(game->parsCheck[2] != 0)
-		printf_error("Error in input, South Texture missing or double.\n");
-	if(game->parsCheck[3] != 0)
-		printf_error("Error in input, West Texture missing or double.\n");
-	if(game->parsCheck[4] != 0)
-		printf_error("Error in input, East Texture missing or double.\n");
-	if(game->parsCheck[5] != 0)
-		printf_error("Error in input, Sprite missing or double.\n");
-	if(game->parsCheck[6] != 0)
-		printf_error("Error in input, Floor color missing or double.\n");
-	if(game->parsCheck[7] != 0)
-		printf_error("Error in input, Ceiling color missing or double.\n");
-	if(game->parsCheck[8] != 0)
-		printf_error("Error in input, Map data missing or double.\n");
+	if (game->parsCheck[0] != 0)
+		printf_error("Error in input, Resolution missing or double.\n", game);
+	if (game->parsCheck[1] != 0)
+		printf_error("Error in input, North Texture missing or double.\n", game);
+	if (game->parsCheck[2] != 0)
+		printf_error("Error in input, South Texture missing or double.\n", game);
+	if (game->parsCheck[3] != 0)
+		printf_error("Error in input, West Texture missing or double.\n", game);
+	if (game->parsCheck[4] != 0)
+		printf_error("Error in input, East Texture missing or double.\n", game);
+	if (game->parsCheck[5] != 0)
+		printf_error("Error in input, Sprite missing or double.\n", game);
+	if (game->parsCheck[6] != 0)
+		printf_error("Error in input, Floor color missing or double.\n", game);
+	if (game->parsCheck[7] != 0)
+		printf_error("Error in input, Ceiling color missing or double.\n", game);
+	if (game->parsCheck[8] != 0)
+		printf_error("Error in input, Map data missing or double.\n", game);
+	if (game->player.posY < 0 || game->player.posX < 0 )
+			printf_error("Error in input, Player position not set.\n", game);
 }
 
 void	main_parser(t_game *game, char *filename)
@@ -80,25 +84,20 @@ void	main_parser(t_game *game, char *filename)
 	printf("parsing starting\n");
 	init_pars_check(game);
 	if ((fd = open(filename, O_RDONLY)) < 1)
-		printf_error("invalid filepath\n");
+		printf_error("invalid filepath\n", game);
 	while ((t = get_next_line(fd, &line)) == 1)
 		mp_helpr(line, game);
+	if	(t < 0)
+		printf_error("get_next_line failed.\n", game);
+	mp_helpr(line, game);
 	printf("parsing done\n");
 	game->parsCheck[8]++;
 	pars_check_result(game);
-	if	(t < 0)
-		printf_error("get_next_line failed.\n");
-	mp_helpr(line, game);
-	for (int i = 0; i < game->map.size; i++)
-	{
-		printf("map:  %s, i: %d\n", game->map.data[i], i);
-	}
-	for (int i = 0; i < 9; i++)
-	{
-		printf("parsCheck:  %d, i: %d\n", game->parsCheck[i], i);
-	}
-	int i =100;
-	printf("screenheight:  %d, i: %d\n", game->vars.screenheight, i);
-	printf("screenwidth:  %d, i: %d\n", game->vars.screenwidth, i);
+	printf("res %d\n\n", game->vars.screenheight);
+	printf("res %d\n\n", game->vars.screenwidth);
+	printf("map.sprite x :%f\n\n", game->sprite.x);
+	printf("map.sprite y :%f\n\n", game->sprite.y);
+	check_map(game);
+//	exit(0);
 	close(fd);
 }

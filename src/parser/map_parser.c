@@ -20,18 +20,34 @@ int		is_direction(char c)
 	return (0);
 }
 
-void	check_input_map_error(char c)
+void	check_input_map_error(char c, t_game *game)
 {
 	if (!(c == '1' || c == '2' || c == '0' || c == ' '
 	|| is_direction(c)))
-		printf_error("Invalid map entry.\n");
+		printf_error("Invalid map entry.\n", game);
 }
 
 void	set_player_pos(t_game *game, char c, int y)
 {
+	if (game->player.posX != -1 || game->player.posX != -1)
+		printf_error("Player position invalid", game);
 	game->player.posX = (double)game->map.size + 0.5;
 	game->player.posY = (double)y + 0.5;
+	if (c == 'N')
+		set_pos_north(game);
+	else if (c =='S')
+		set_pos_south(game);
+	else if (c =='E')
+		set_pos_east(game);
+	else if (c =='W')
+		set_pos_west(game);
+
 	
+}
+void	set_sprite_pos(t_game *game, char c, int y)
+{
+	game->sprite.x = (double)game->map.size + 0.5;
+	game->sprite.y = (double)y + 0.5;	
 }
 
 void	map_parser(t_game *game,char *line)
@@ -41,29 +57,27 @@ void	map_parser(t_game *game,char *line)
 
 	
 	if (!(temp_map = (char **)malloc((game->map.size+1) * sizeof(char *))))
-		printf_error("malloc map failed.\n");
-	j = -1;
-	
-	printf("mohit 1\n\n");
-	printf("J value: %d\n", j);
-	printf("game->map.size:%d\n",game->map.size);
+		printf_error("malloc map failed.\n", game);
+	j = -1;	
 	while (++j < game->map.size)
 		temp_map[j] = game->map.data[j];
-	printf("mohit 1.5\n\n");
 	if (game->map.size > 0)
 		free(game->map.data);
-	printf("mohit 2\n\n");
 	game->map.data = temp_map;
 	j = 0;
-	printf("mohit\n\n");
 	while (line[j] != '\0')
 	{
 		if (is_direction(line[j]))
 		{
-			line[j] = '0';
 			set_player_pos(game, line[j], j);
+			line[j] = '0';
 		}
-		check_input_map_error(line[j++]);
+		else if (line[j] == '2')
+		{
+			set_sprite_pos(game, line[j],j);
+			line[j] = '0';
+		}
+		check_input_map_error(line[j++], game);
 	}
 	char *str = ft_strdup(line);
 	game->map.data[game->map.size] = str;

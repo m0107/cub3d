@@ -17,12 +17,17 @@
 #define texWidth 64
 #define texHeight 64
 
-#include <mlx.h>
+#include "mlx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
+// if Aplple
+#include "./keys/keys_darwin.h"
+
+// if linux
+// #include "./keys/keys_linux.h"
 
 #include "../libft/libft.h"
 #include "../gnl/get_next_line.h"
@@ -72,12 +77,19 @@ typedef struct	s_map {
 	int			size;
 }				t_map;
 
+typedef struct s_sprite {
+	t_texture texture;
+	double x;
+	double y;
+}				t_sprite;
+
 typedef struct  s_game {
 	int			parsCheck[9];
     t_player	player;
 	t_texture	textures[4];
 	t_vars		vars;
 	t_map		map;
+	t_sprite	sprite;
 }               t_game;
 
 void	main_parser(t_game *game, char *filename);
@@ -87,9 +99,10 @@ void	res_parser(t_game *game, char *line);
 void	check_n_set_res(t_game *game,int screenWidth, int screenHeight);
 
 void	tex_parser(t_game *game, char *line);
-void	load_texture(void *mlx_ptr, char *filename, t_texture *res);
+void	load_texture(void *mlx_ptr, char *filename, t_texture *res, t_game *game);
 
 void	color_parser(t_game *game, char *line);
+void	sprite_parser(t_game *game, char *line);
 
 
 int		checkno_cub(long ans, int sign);
@@ -97,7 +110,13 @@ int		ft_atoi_cub(char **str);
 
 char	*remove_space(char *line);
 
-void	printf_error(char *error);
+void	check_map(t_game *game);
+void	printf_error(char *error, t_game *game);
+
+void	set_pos_north(t_game *game);
+void	set_pos_south(t_game *game);
+void	set_pos_east(t_game *game);
+void	set_pos_west(t_game *game);
 
 
 #endif

@@ -20,10 +20,16 @@ void	check_n_set_res(t_game *game, int screenwidth, int screenheight)
 		screenheight = 1440;
 	
 	if(screenwidth <= 0 || screenheight <= -1)
-		printf_error("Invalid Resolution\n");
+		printf_error("Invalid Resolution\n", game);
 	
 	game->vars.screenheight = screenheight;
 	game->vars.screenwidth = screenwidth;
+}
+
+void remove_extra(char **line)
+{
+	while(**line >= '0' && **line <= '9')
+		(*line)++;
 }
 
 void	res_parser(t_game *game, char *line)
@@ -33,14 +39,16 @@ void	res_parser(t_game *game, char *line)
 	int	loop_len;
 
 	if (game->map.size > 0)
-		printf_error("Input order incorrect.\n");
+		printf_error("Input order incorrect.\n", game);
 	line = line + 2;
 	screenwidth = ft_atoi_cub(&line);
+	remove_extra(&line);
 	screenheight = ft_atoi_cub(&line);
-	while (*line != '\0' && *line != 0 )
+	remove_extra(&line);
+	while (*line != '\0')
 	{
 		if(*line != ' ')
-			printf_error("Extra input in resolution\n");
+			printf_error("Extra input in resolution\n", game);
 		line++;
 	}
 	check_n_set_res(game, screenwidth, screenheight);

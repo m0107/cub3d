@@ -1,5 +1,17 @@
-# Makefile template for a shared library in C
+UNAME_S				:= $(shell uname -s)
+OS					= 0
 
+ifeq ($(UNAME_S), Linux)
+	OS = 1
+	LGL := -lGL -lm
+	LGL_INC := /usr/include/GL
+	MLXFLAG := -lXext -lX11
+else ifeq ($(UNAME_S), Darwin)
+	OS = 2
+	MLXFLAG := -framework OpenGL -framework Appkit -lmlx
+endif
+
+$(info    VAR is $(MLXFLAG))
 
 CC=gcc
 
@@ -9,7 +21,9 @@ CC = gcc  # C compiler
 # -fsanitize=address
 
 #CFLAGS = -Wall -Werror -Wextra -I. -Ilibft/. -c  # C flags
-CFLAGS =  -Isrc -Ilibft -Imlx -Ignl -I/usr/include -O3# C flags
+INCLUDES =  -Isrc -Ilibft -Ignl # C flags
+
+CFLAGS	= -Ofast -D OS=$(OS)  $(INCLUDES)
 
 RM = rm -f   # rm command
 LIBFT_DIR	=	./libft
@@ -36,10 +50,13 @@ SRCS = ./src/main.c \
 src/error.c \
 src/parser/main_parser.c \
 src/parser/tex_parser.c \
+src/parser/sprite_parser.c \
 src/parser/res_parser.c \
 src/parser/color_parser.c \
 src/parser/map_parser.c \
 src/utils/ft_atoi_cub.c \
+src/utils/map_check.c \
+src/utils/player_pos_helper.c \
 src/utils/space.c \
 
 GNL_SRCS = gnl/get_next_line.c \
@@ -53,8 +70,6 @@ OBJS = $(SRCS:.c=.o)
 all:  $(LIBFT)  $(NAME)
 	@printf "Makefile starts\n"
 
-gnl/%.o: gnl/%.c
-	$(CC) -Ignl -c $< -o $@
 
 $(MLX):
 	@printf "compiling mlx\n"
@@ -66,15 +81,11 @@ $(LIBFT):
 
 $(NAME): $(OBJS) $(GNL_OBJS)
 	@printf "$(OBJS)\n"
-	$(CC) $(CFLAGS) $^ -o $@  -Lmlx -lmlx -L/usr/include/lib -lXext -lX11 -lm -lbsd  -Llibft -lft
+	$(CC) $(CFLAGS) $^ -o $@   -lmlx  $(MLXFLAG) -lm   -Llibft -lft
 
 
-src/%.o: src/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
 
 
-src/parser/%.o: src/parser/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
 
 
 #$(B_OBJS):$(B_SRCS)
@@ -85,7 +96,7 @@ src/parser/%.o: src/parser/%.c
 #	ar rcs $(NAME) $(OBJS) $(B_OBJS)
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(GNL_OBJS)
 	#make -C $(LIBFT_DIR) clean
 	#make -C $(MLX_DIR) clean
 

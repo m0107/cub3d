@@ -1,21 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   sprite_parser.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgupta <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/08/14 01:50:48 by mgupta            #+#    #+#             */
-/*   Updated: 2020/08/14 01:51:07 by mgupta           ###   ########.fr       */
+/*   Created: 2020/08/16 03:27:56 by mgupta            #+#    #+#             */
+/*   Updated: 2020/08/16 03:27:58 by mgupta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../cub3d.h"
 
-void	printf_error(char *error, t_game *game)
+void	sprite_parser(t_game *game, char *line)
 {
-	perror("Error\n");
-	ft_putstr_fd(": ", 1);
-	ft_putstr_fd(error, 1);
-	exit(0);
+	
+	if (game->map.size > 0)
+		printf_error("Input order incorrect.\n", game);
+
+	line = line + 1;
+	load_texture(game->vars.mlx, remove_space(line), &game->sprite.texture, game);
+	game->parsCheck[5]++;
 }
+
