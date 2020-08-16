@@ -24,10 +24,10 @@
 #include <string.h>
 
 // if Aplple
-#include "./keys/keys_darwin.h"
+// #include "./keys/keys_darwin.h"
 
 // if linux
-// #include "./keys/keys_linux.h"
+ #include "./keys/keys_linux.h"
 
 #include "../libft/libft.h"
 #include "../gnl/get_next_line.h"
@@ -77,10 +77,14 @@ typedef struct	s_map {
 	int			size;
 }				t_map;
 
+typedef struct s_sp_pos {
+	double	x;
+	double	y;
+}				t_sp_pos;
+
 typedef struct s_sprite {
-	t_texture texture;
-	double x;
-	double y;
+	t_texture	texture;
+	t_sp_pos	*pos
 }				t_sprite;
 
 typedef struct  s_game {

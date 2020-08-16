@@ -120,7 +120,7 @@ void render(t_game *game)
 				side = 1;
 			}
 			//Check if ray has hit a wall
-			if(game->map.data[mapX][mapY] > '0')
+			if(game->map.data[mapX][mapY] == '1')
 				hit = 1;
 			
 		}
@@ -231,11 +231,11 @@ void render(t_game *game)
 	if(drawEndY >= game->vars.screenheight) drawEndY = game->vars.screenheight - 1;
 
 	//calculate width of the sprite
-	int spriteWidth = abs( (int) (game->vars.screenheight / (transformY)));
+	int spriteWidth = abs( (int) ceil((game->vars.screenheight / (transformY))));
 	int drawStartX = -spriteWidth / 2 + spriteScreenX;
 	if(drawStartX < 0) drawStartX = 0;
 	int drawEndX = spriteWidth / 2 + spriteScreenX;
-	if(drawEndX >= game->vars.screenheight) drawEndX = game->vars.screenwidth - 1;
+	if(drawEndX >= game->vars.screenwidth) drawEndX = game->vars.screenwidth - 1;
 	unsigned char color[4];
 	//loop through every vertical stripe of the sprite on screen
 	for(int stripe = drawStartX; stripe < drawEndX; stripe++)
@@ -246,14 +246,20 @@ void render(t_game *game)
 		//2) it's on the screen (left)
 		//3) it's on the screen (right)
 		//4) ZBuffer, with perpendicular distance
-		if(transformY > 0 && stripe > 0 && stripe < game->vars.screenwidth && transformY < ZBuffer[stripe])
-		for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+		if(transformY > 0 && stripe > 0 && stripe < game->vars.screenwidth && transformY < ZBuffer[stripe] + 1)
 		{
-			int d = (y) * 256 - game->vars.screenheight * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
-			int texY = ((d * texHeight) / spriteHeight) / 256;
-			get_pixel_color(game->sprite.texture, texX, texY, color);
-			if (color[3] != 255)
-				draw_pixel(&game->vars, stripe, y, color);
+			for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
+			{
+				int d = (y) * 256 - game->vars.screenheight * 128 + spriteHeight * 128; //256 and 128 factors to avoid floats
+				int texY = ((d * texHeight) / spriteHeight) / 256;
+				get_pixel_color(game->sprite.texture, texX, texY, color);
+				if(color[3] ==  0)
+				{
+					
+				}
+				if (!(color[0] == 0 || color[3] == 0 && color[2] == 0 &&  color[1] == 0))
+					draw_pixel(&game->vars, stripe, y, color);
+			}
 		}
 	}
 	//printf("drawing finished\n\n");
@@ -269,7 +275,7 @@ int             ft_close(int keycode, t_game *game)
 	double rotSpeed = 0.0872665;
 	//double rotSpeed = 0.0872665; //the constant value is in radians/second
 	//printf("pos x: %f | y: %f\n", game->player.posX, game->player.posY);
-	//printf("keycode: %d******\n\n\n", keycode);
+	printf("keycode: %d******\n\n\n", keycode);
 	//forward
 	if(keycode == KEY_W)
 	{		
@@ -349,6 +355,7 @@ int             ft_close(int keycode, t_game *game)
 			free(game->map.data[i]);
 		}
 		printf("map freed\n\n");
+		exit(0);
 		
 	}
 	return (1);
@@ -362,8 +369,6 @@ int             main(int argc, char *argv[])
 	
 	game.vars.mlx = mlx_init();
 	main_parser(&game, argv[1]);
-	printf("posX: %f\n", game.player.posX);
-	printf("posY: %f\n", game.player.posY);
 	
 	
 	game.vars.win = mlx_new_window(game.vars.mlx, game.vars.screenwidth, game.vars.screenheight, "Hello world!");

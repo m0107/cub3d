@@ -46,8 +46,8 @@ void	set_player_pos(t_game *game, char c, int y)
 }
 void	set_sprite_pos(t_game *game, char c, int y)
 {
-	game->sprite.x = (double)game->map.size + 0.5;
-	game->sprite.y = (double)y + 0.5;	
+	game->sprite.x = (double)(game->map.size)+0.5;
+	game->sprite.y = (double)(y)+0.5;	
 }
 
 void	map_parser(t_game *game,char *line)
@@ -75,7 +75,7 @@ void	map_parser(t_game *game,char *line)
 		else if (line[j] == '2')
 		{
 			set_sprite_pos(game, line[j],j);
-			line[j] = '0';
+			line[j] = '2';
 		}
 		check_input_map_error(line[j++], game);
 	}

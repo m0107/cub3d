@@ -13,9 +13,9 @@
 
 #ifndef KEYS_LINUX_H
 # define KEYS_LINUX_H
-# define KEY_A 113
+# define KEY_A 97
 # define KEY_S 115
-# define KEY_D 2
+# define KEY_D 100
 # define KEY_F 3
 # define KEY_H 4
 # define KEY_G 5
@@ -25,7 +25,7 @@
 # define KEY_V 9
 # define KEY_B 11
 # define KEY_Q 97
-# define KEY_W 122
+# define KEY_W 119
 # define KEY_E 101
 # define KEY_R 15
 # define KEY_Y 16

@@ -4,11 +4,11 @@ OS					= 0
 ifeq ($(UNAME_S), Linux)
 	OS = 1
 	LGL := -lGL -lm
-	LGL_INC := /usr/include/GL
-	MLXFLAG := -lXext -lX11
+	LGL_INC := /usr/include/
+	MLXFLAG := -lXext -lX11 -lbsd
 else ifeq ($(UNAME_S), Darwin)
 	OS = 2
-	MLXFLAG := -framework OpenGL -framework Appkit -lmlx
+	MLXFLAG := -framework OpenGL -framework Appkit
 endif
 
 $(info    VAR is $(MLXFLAG))
@@ -21,7 +21,7 @@ CC = gcc  # C compiler
 # -fsanitize=address
 
 #CFLAGS = -Wall -Werror -Wextra -I. -Ilibft/. -c  # C flags
-INCLUDES =  -Isrc -Ilibft -Ignl # C flags
+INCLUDES =  -Isrc -Ilibft -Ignl -I$(LGL_INC) # C flags
 
 CFLAGS	= -Ofast -D OS=$(OS)  $(INCLUDES)
 
@@ -81,7 +81,7 @@ $(LIBFT):
 
 $(NAME): $(OBJS) $(GNL_OBJS)
 	@printf "$(OBJS)\n"
-	$(CC) $(CFLAGS) $^ -o $@   -lmlx  $(MLXFLAG) -lm   -Llibft -lft
+	$(CC) $(CFLAGS) $^ -o $@  -lmlx  $(MLXFLAG) -lm   -Llibft -lft
 
 
 
