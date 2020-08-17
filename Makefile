@@ -4,7 +4,7 @@ OS					= 0
 ifeq ($(UNAME_S), Linux)
 	OS = 1
 	LGL := -lGL -lm
-	LGL_INC := /usr/include/
+	LGL_INC := -I/usr/include/
 	MLXFLAG := -lXext -lX11 -lbsd
 else ifeq ($(UNAME_S), Darwin)
 	OS = 2
@@ -81,7 +81,7 @@ $(LIBFT):
 
 $(NAME): $(OBJS) $(GNL_OBJS)
 	@printf "$(OBJS)\n"
-	$(CC) $(CFLAGS) $^ -o $@  -lmlx  $(MLXFLAG) -lm   -Llibft -lft
+	$(CC) $(CFLAGS) $^ -o $@  -lmlx $(LGL_INC) $(MLXFLAG) -lm   -Llibft -lft
 
 
 
