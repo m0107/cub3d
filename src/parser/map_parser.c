@@ -22,7 +22,6 @@ int		is_direction(char c)
 
 void	check_input_map_error(char c, t_game *game)
 {
-	printf("Invalid entry: %c\n", c);
 	if (!(c == '1' || c == '2' || c == '0' || c == ' '
 	|| is_direction(c)))
 		printf_error("Invalid map entry.\n", game);
@@ -49,24 +48,35 @@ void	set_sprite_pos(t_game *game, char c, int y, int i)
 {
 	t_sp_pos *temp_sp_pos;
 	int j;
-	printf("set_sprite_pos\n");
-	if (!(temp_sp_pos = (t_sp_pos *)malloc((i+1) * sizeof(temp_sp_pos))))
-		printf_error("malloc sprite failed.\n", game);
-	j = -1;	
-	while (++j < i)
-		temp_sp_pos[j] = game->sprite.pos[j];
-	
-	if (i > 0)
-		free(game->sprite.pos);
-	
-	game->sprite.pos = temp_sp_pos;
-	game->sprite.pos[i].x = (double)(game->map.size)+0.5;
-	game->sprite.pos[i].y = (double)(y)+0.5;	
-	j = -1;
-	while (++j <= i) {
-		printf(" game->sprite.pos[%d].x :%f\n", j, game->sprite.pos[j].x);
-		printf(" game->sprite.pos[%d].y :%f\n", j, game->sprite.pos[j].y);	
+	printf("set_sprite_pos: i: %d\n", i);
+	if(i > 0)
+		if (!(game->sprite.pos = (t_sp_pos *)realloc(game->sprite.pos,(i+1) * sizeof(t_sp_pos))))
+			printf_error("malloc sprite failed.\n", game);
+	if(i == 0 )
+	{
+		if (!(game->sprite.pos = (t_sp_pos *)malloc((i+1) * sizeof(t_sp_pos))))
+			printf_error("malloc sprite failed.\n", game);
+		printf("i  ==  0\n");
 	}
+	// j = -1;	
+	// while (++j < i){
+	// 	temp_sp_pos[j].x = game->sprite.pos[j].x;
+	// 	temp_sp_pos[j].y = game->sprite.pos[j].y;
+	// }
+	printf("Mohit   i: %d\n\n\n",i);
+	game->sprite.pos[i].x = (double)(game->map.size + 0.5);
+	game->sprite.pos[i].y = (double)y +0.5;	
+	printf(" game->sprite.pos[%d].x :%f\n", i, game->sprite.pos[i].x);
+		printf(" game->sprite.pos[%d].y :%f\n", i, game->sprite.pos[i].y);	
+	// if (i > 0){
+	// 	printf("freeing sprite arrayn\n\n\n");
+	// 	free(game->sprite.pos);
+	// 	game->sprite.pos = NULL;
+	// }
+	printf("done freeing : value of Y: %f\n\n", (double)y + 0.5);
+	//game->sprite.pos = temp_sp_pos;
+		printf(" game->sprite.pos[%d].x :%f\n", i, game->sprite.pos[i].x);
+		printf(" game->sprite.pos[%d].y :%f\n", i, game->sprite.pos[i].y);	
 }
 
 void	map_parser(t_game *game,char *line)
@@ -81,10 +91,12 @@ void	map_parser(t_game *game,char *line)
 	while (++j < game->map.size)
 		temp_map[j] = game->map.data[j];
 	if (game->map.size > 0)
+	{
 		free(game->map.data);
+		game->map.data = NULL;
+	}
 	game->map.data = temp_map;
 	j = -1;
-
 	while (line[++j] != '\0')
 	{
 		check_input_map_error(line[j], game);
@@ -97,7 +109,6 @@ void	map_parser(t_game *game,char *line)
 		{
 			printf("2 detected.\n");
 			set_sprite_pos(game, line[j],j, game->sprite.size );
-			line[j] = '2';
 			game->sprite.size++;
 		}
 	}

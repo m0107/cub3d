@@ -15,41 +15,62 @@
 #include "math.h"
 #include "../gnl/get_next_line.h"
 
-int compare(const void * a, const void * b) 
-{ 
-	t_sprites *a_sprite = (t_sprites *) a;
-	t_sprites *b_sprite = (t_sprites *) b;
-    return ( a_sprite->first - b_sprite->first ); 
-} 
+
 
 //sort the sprites based on distance
 void sortSprites(int* order, double* dist, int amount, t_game *game)
 {
   //std::vector<std::pair<double, int>> sprites(amount);
-	t_sprites *sprites;
-	printf("amount: %d\n", amount);
-	if (!(sprites = (t_sprites *)malloc((amount) * sizeof(t_sprites))))
-		printf_error("malloc spriteOrder failed.\n", game);
+	double *sprites_first;
+	double *sprites_second;
+	printf("amount--: %d\n", amount);
+	printf(" sizeof(t_p_order)--: %ld\n",  sizeof(double));
+	
+	sprites_first = (double *)malloc((amount) * sizeof(double));
+	sprites_second = (double *)malloc((amount) * sizeof(double));
+	
 
+	printf("mohit\n");
+	//exit(0);
   for(int i = 0; i < amount; i++) {
-    sprites[i].first = dist[i];
-    sprites[i].second = order[i];
+    sprites_first[i] = dist[i];
+    sprites_second[i] = order[i];
   }
-   for(int i = 0; i < amount; i++) {
-    printf("dist[%d]: %f\n", i, dist[i]);
-	printf("order[%d]: %d\n\n\n", i, order[i]);
+   
+  	// std::sort(sprites.begin(), sprites.end());
+  	int i, j; 
+   for (i = 0; i < amount-1; i++) 
+	{
+  		for (j = 0; j < amount-i-1; j++)  
+        {
+				if (sprites_first[j] > sprites_first[j+1]) 
+				{
+            		
+					double	tempx;
+					double	tempy;
+
+					tempx = sprites_first[j];
+					sprites_first[j] = sprites_first[j + 1];
+					sprites_first[j +1] = tempx;
+
+					tempy = sprites_second[j];
+					sprites_second[j]= sprites_second[j + 1];
+					sprites_second[j +1]= tempy;
+				}
+		}
+	}
+	  for(int i = 0; i < amount; i++) {
+    dist[i] = sprites_first[amount - i - 1];
+    order[i] = sprites_second[amount - i - 1];
   }
-  // std::sort(sprites.begin(), sprites.end());
-  qsort(sprites, amount, sizeof(t_sprites), compare); 
-  // restore in reverse order to go from farthest to nearest
-  for(int i = 0; i < amount; i++) {
-    dist[i] = sprites[amount - i - 1].first;
-    order[i] = sprites[amount - i - 1].second;
-  }
+
+
   for(int i = 0; i < amount; i++) {
     printf("dist[%d]: %f\n", i, dist[i]);
 	printf("order[%d]: %d\n", i, order[i]);
   }
+  free(sprites_first);
+  free(sprites_second);
   //exit(0);
 }
 
@@ -101,7 +122,7 @@ void	draw_pixel(t_vars *vars, unsigned int x, unsigned int y,
 void render(t_game *game)
 {
 	int   ZBuffer[500];
-	//printf("inside rendering function\n\n");
+	printf("inside rendering function\n\n");
 	for(int x = 0; x < game->vars.screenwidth; x++) 
 	{
 		//calculate ray position and direction
@@ -256,10 +277,10 @@ void render(t_game *game)
 	int *spriteOrder;
 	double *spriteDistance;
 
-	if (!(spriteOrder = (int *)malloc((game->map.size) * sizeof(int))))
+	if (!(spriteOrder = (int *)malloc((game->sprite.size) * sizeof(int))))
 		printf_error("malloc spriteOrder failed.\n", game);
 
-	if (!(spriteDistance = (double *)malloc((game->map.size) * sizeof(double))))
+	if (!(spriteDistance = (double *)malloc((game->sprite.size) * sizeof(double))))
 		printf_error("malloc spriteOrder failed.\n", game);
 
 
@@ -268,6 +289,12 @@ void render(t_game *game)
       spriteOrder[i] = i;
       spriteDistance[i] = sqrt(((game->player.posX - game->sprite.pos[i].x) * (game->player.posX - game->sprite.pos[i].x) + (game->player.posY - game->sprite.pos[i].y) * (game->player.posY - game->sprite.pos[i].y))); //sqrt not taken, unneeded
     }
+
+  for(int i = 0; i < game->sprite.size; i++) {
+    printf("*****dist[%d]: %f\n", i, spriteDistance[i]);
+	printf("*****order[%d]: %d\n", i, spriteOrder[i]);
+  }
+//  exit(0);
 	printf("startig sorting\n\n");
 	sortSprites(spriteOrder, spriteDistance, game->sprite.size, game);
 	printf("startig done\n\n");
@@ -307,7 +334,7 @@ void render(t_game *game)
 		//2) it's on the screen (left)
 		//3) it's on the screen (right)
 		//4) ZBuffer, with perpendicular distance
-		if(transformY > 0 && stripe > 0 && stripe < game->vars.screenwidth && transformY < ZBuffer[stripe] + 0.5)
+		if(transformY > 0 && stripe > 0 && stripe < game->vars.screenwidth && transformY < ZBuffer[stripe] + 1)
 		{
 			for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
 			{
@@ -318,20 +345,26 @@ void render(t_game *game)
 				{
 					
 				}
-				if ( color[3] != 255)
+				if ( color[1] != 0 ||  color[2] != 0 ||  color[3] != 0 )
 					draw_pixel(&game->vars, stripe, y, color);
 			}
 		}
+		int o;
+		// printf("Enter");
+		// scanf("%o", &o);
+		// mlx_put_image_to_window(game->vars.mlx, game->vars.win, game->vars.img.img, 0, 0);	
+	
 	}
 	
 	
 	}
 	free(spriteOrder);
 	free(spriteDistance);
-	//printf("drawing finished\n\n");
-
-	mlx_put_image_to_window(game->vars.mlx, game->vars.win, game->vars.img.img, 0, 0);	
-	//printf("rendering done\n\n");
+	printf("drawing finished\n\n");
+	int e;
+	mlx_put_image_to_window(game->vars.mlx, game->vars.win, game->vars.img.img, 0, 0);
+	
+	printf("rendering done\n\n");
 }
 
 int             ft_close(int keycode, t_game *game)
@@ -421,6 +454,7 @@ int             ft_close(int keycode, t_game *game)
 		{
 			free(game->map.data[i]);
 		}
+		free(game->map.data);
 		free(game->sprite.pos);
 		printf("map freed\n\n");
 		exit(0);

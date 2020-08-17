@@ -93,6 +93,7 @@ typedef struct s_sprite {
 }				t_sprite;
 
 typedef struct  s_game {
+	int temp;
 	int			parsCheck[9];
     t_player	player;
 	t_texture	textures[4];
@@ -101,10 +102,10 @@ typedef struct  s_game {
 	t_sprite	sprite;
 }               t_game;
 
-typedef struct	sprites {
+typedef struct	s_p_order {
 	double	first;
 	int		second;
-}				t_sprites;
+}				t_p_order;
 
 void	main_parser(t_game *game, char *filename);
 

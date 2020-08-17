@@ -44,6 +44,7 @@ void	init_pars_check(t_game *game)
 	{
 		game->parsCheck[i] = -1;
 	}
+	game->temp = 0;
 	game->map.size = 0;
 	game->player.posX = -1;
 	game->player.posY = -1;
@@ -101,6 +102,6 @@ void	main_parser(t_game *game, char *filename)
 	printf("map.player.pos y :%f\n\n", game->player.posY);
 	check_map(game);
 	printf("map checked\n");
-//	exit(0);
+	//exit(0);
 	close(fd);
 }
