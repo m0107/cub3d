@@ -21,29 +21,11 @@ CC = gcc  # C compiler
 # -fsanitize=address
 
 #CFLAGS = -Wall -Werror -Wextra -I. -Ilibft/. -c  # C flags
-INCLUDES =  -Isrc -Ilibft -Ignl # C flags
+INCLUDES =  -Isrc -Ignl # C flags
 
 CFLAGS	= -Ofast -D OS=$(OS)  $(INCLUDES)
 
 RM = rm -f   # rm command
-LIBFT_DIR	=	./libft
-LIBFT =	$(LIB_DIR)/libft.a
-
-MLX_DIR = ./mlx
-MLX = $(MLX_DIR)/libmlx.a
-
-
-# Include all your bonus files here
-#B_SRCS = ft_lstadd_back.c \
-ft_lstadd_front.c \
-ft_lstclear.c \
-ft_lstdelone.c \
-ft_lstiter.c \
-ft_lstlast.c \
-ft_lstmap.c \
-ft_lstnew.c \
-ft_lstsize.c \
-
 
 #include all your main .c files here
 SRCS = ./src/main.c \
@@ -70,30 +52,10 @@ OBJS = $(SRCS:.c=.o)
 all:  $(LIBFT)  $(NAME)
 	@printf "Makefile starts\n"
 
-
-$(MLX):
-	@printf "compiling mlx\n"
-	make -C mlx/
-
-$(LIBFT):
-	@printf "compiling libft\n"
-	make -C libft/
-
 $(NAME): $(OBJS) $(GNL_OBJS)
 	@printf "$(OBJS)\n"
-	$(CC) $(CFLAGS) $^ -o $@  -lmlx $(LGL_INC) $(MLXFLAG) -lm   -Llibft -lft
+	$(CC) $(CFLAGS) $^ -o $@  -lmlx $(LGL_INC) $(MLXFLAG) -lm
 
-
-
-
-
-
-#$(B_OBJS):$(B_SRCS)
-#	$(CC) $(CFLAGS) $(B_SRCS)
-
-#bonus: $(OBJS) $(B_OBJS)
-#	rm -f $(NAME)
-#	ar rcs $(NAME) $(OBJS) $(B_OBJS)
 
 clean:
 	rm -f $(OBJS) $(GNL_OBJS)

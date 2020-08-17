@@ -23,13 +23,17 @@
 #include <math.h>
 #include <string.h>
 
+
+# include <stddef.h>
+# include <stdlib.h>
+# include <unistd.h>
+
 // if Aplple
-#include "./keys/keys_darwin.h"
+// #include "./keys/keys_darwin.h"
 
 // if linux
-// #include "./keys/keys_linux.h"
+#include "./keys/keys_linux.h"
 
-#include "../libft/libft.h"
 #include "../gnl/get_next_line.h"
 
 typedef struct  s_player {
