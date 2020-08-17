@@ -47,6 +47,7 @@ void	init_pars_check(t_game *game)
 	game->map.size = 0;
 	game->player.posX = -1;
 	game->player.posY = -1;
+	game->sprite.size = 0;
 }
 
 void pars_check_result(t_game *game)
@@ -87,6 +88,7 @@ void	main_parser(t_game *game, char *filename)
 		printf_error("invalid filepath\n", game);
 	while ((t = get_next_line(fd, &line)) == 1)
 		mp_helpr(line, game);
+	printf("debug*******************\n\n\n");
 	if	(t < 0)
 		printf_error("get_next_line failed.\n", game);
 	mp_helpr(line, game);
@@ -95,9 +97,10 @@ void	main_parser(t_game *game, char *filename)
 	pars_check_result(game);
 	printf("res %d\n\n", game->vars.screenheight);
 	printf("res %d\n\n", game->vars.screenwidth);
-	printf("map.sprite x :%f\n\n", game->sprite.x);
-	printf("map.sprite y :%f\n\n", game->sprite.y);
+	printf("map.player.pos x :%f\n\n", game->player.posX);
+	printf("map.player.pos y :%f\n\n", game->player.posY);
 	check_map(game);
+	printf("map checked\n");
 //	exit(0);
 	close(fd);
 }

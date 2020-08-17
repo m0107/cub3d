@@ -21,7 +21,7 @@ CC = gcc  # C compiler
 # -fsanitize=address
 
 #CFLAGS = -Wall -Werror -Wextra -I. -Ilibft/. -c  # C flags
-INCLUDES =  -Isrc -Ilibft -Ignl -I$(LGL_INC) # C flags
+INCLUDES =  -Isrc -Ilibft -Ignl # C flags
 
 CFLAGS	= -Ofast -D OS=$(OS)  $(INCLUDES)
 

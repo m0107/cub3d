@@ -15,7 +15,7 @@
 void	printf_error(char *error, t_game *game)
 {
 	perror("Error\n");
-	//ft_putstr_fd(": ", 1);
-	//ft_putstr_fd(error, 1);
+	ft_putstr_fd(": ", 1);
+	ft_putstr_fd(error, 1);
 	exit(0);
 }

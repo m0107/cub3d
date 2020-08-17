@@ -15,6 +15,44 @@
 #include "math.h"
 #include "../gnl/get_next_line.h"
 
+int compare(const void * a, const void * b) 
+{ 
+	t_sprites *a_sprite = (t_sprites *) a;
+	t_sprites *b_sprite = (t_sprites *) b;
+    return ( a_sprite->first - b_sprite->first ); 
+} 
+
+//sort the sprites based on distance
+void sortSprites(int* order, double* dist, int amount, t_game *game)
+{
+  //std::vector<std::pair<double, int>> sprites(amount);
+	t_sprites *sprites;
+	printf("amount: %d\n", amount);
+	if (!(sprites = (t_sprites *)malloc((amount) * sizeof(t_sprites))))
+		printf_error("malloc spriteOrder failed.\n", game);
+
+  for(int i = 0; i < amount; i++) {
+    sprites[i].first = dist[i];
+    sprites[i].second = order[i];
+  }
+   for(int i = 0; i < amount; i++) {
+    printf("dist[%d]: %f\n", i, dist[i]);
+	printf("order[%d]: %d\n\n\n", i, order[i]);
+  }
+  // std::sort(sprites.begin(), sprites.end());
+  qsort(sprites, amount, sizeof(t_sprites), compare); 
+  // restore in reverse order to go from farthest to nearest
+  for(int i = 0; i < amount; i++) {
+    dist[i] = sprites[amount - i - 1].first;
+    order[i] = sprites[amount - i - 1].second;
+  }
+  for(int i = 0; i < amount; i++) {
+    printf("dist[%d]: %f\n", i, dist[i]);
+	printf("order[%d]: %d\n", i, order[i]);
+  }
+  //exit(0);
+}
+
 
 void		get_pixel_color(t_texture texture, int x, int y,
 		unsigned char *result)
@@ -144,7 +182,7 @@ void render(t_game *game)
 		
 			return;
 			}
-			ZBuffer[x] = perpWallDist; //perpendicular distance is used
+		
 		//  printf("Calculate height of line to draw on screen\n\n");
 		//Calculate height of line to draw on screen
 		int lineHeight = (int)(game->vars.screenheight / perpWallDist);
@@ -211,9 +249,32 @@ void render(t_game *game)
 			{
 				my_mlx_pixel_put(&game->vars, x, i, game->vars.floor_color);
 			}
+			ZBuffer[x] = perpWallDist; //perpendicular distance is used
 	}
-	double spriteX = game->sprite.x - game->player.posX;
-	double spriteY = game->sprite.y - game->player.posY;
+	//SPRITE CASTING
+    //sort sprites from far to close
+	int *spriteOrder;
+	double *spriteDistance;
+
+	if (!(spriteOrder = (int *)malloc((game->map.size) * sizeof(int))))
+		printf_error("malloc spriteOrder failed.\n", game);
+
+	if (!(spriteDistance = (double *)malloc((game->map.size) * sizeof(double))))
+		printf_error("malloc spriteOrder failed.\n", game);
+
+
+	for(int i = 0; i < game->sprite.size; i++)
+    {
+      spriteOrder[i] = i;
+      spriteDistance[i] = sqrt(((game->player.posX - game->sprite.pos[i].x) * (game->player.posX - game->sprite.pos[i].x) + (game->player.posY - game->sprite.pos[i].y) * (game->player.posY - game->sprite.pos[i].y))); //sqrt not taken, unneeded
+    }
+	printf("startig sorting\n\n");
+	sortSprites(spriteOrder, spriteDistance, game->sprite.size, game);
+	printf("startig done\n\n");
+	for(int i = 0; i < game->sprite.size; i++)
+    {
+	double spriteX = game->sprite.pos[spriteOrder[i]].x - game->player.posX;
+	double spriteY = game->sprite.pos[spriteOrder[i]].y - game->player.posY;
 
 	double invDet = 1.0 / (game->player.planeX * game->player.dirY - game->player.dirX * game->player.planeY); //required for correct matrix multiplication
 
@@ -231,7 +292,7 @@ void render(t_game *game)
 	if(drawEndY >= game->vars.screenheight) drawEndY = game->vars.screenheight - 1;
 
 	//calculate width of the sprite
-	int spriteWidth = abs( (int) ceil((game->vars.screenheight / (transformY))));
+	int spriteWidth = abs( (int)(game->vars.screenheight / (transformY)));
 	int drawStartX = -spriteWidth / 2 + spriteScreenX;
 	if(drawStartX < 0) drawStartX = 0;
 	int drawEndX = spriteWidth / 2 + spriteScreenX;
@@ -246,7 +307,7 @@ void render(t_game *game)
 		//2) it's on the screen (left)
 		//3) it's on the screen (right)
 		//4) ZBuffer, with perpendicular distance
-		if(transformY > 0 && stripe > 0 && stripe < game->vars.screenwidth && transformY < ZBuffer[stripe] + 1)
+		if(transformY > 0 && stripe > 0 && stripe < game->vars.screenwidth && transformY < ZBuffer[stripe] + 0.5)
 		{
 			for(int y = drawStartY; y < drawEndY; y++) //for every pixel of the current stripe
 			{
@@ -257,12 +318,18 @@ void render(t_game *game)
 				{
 					
 				}
-				if (!(color[0] == 0 || color[3] == 0 && color[2] == 0 &&  color[1] == 0))
+				if ( color[3] != 255)
 					draw_pixel(&game->vars, stripe, y, color);
 			}
 		}
 	}
+	
+	
+	}
+	free(spriteOrder);
+	free(spriteDistance);
 	//printf("drawing finished\n\n");
+
 	mlx_put_image_to_window(game->vars.mlx, game->vars.win, game->vars.img.img, 0, 0);	
 	//printf("rendering done\n\n");
 }
@@ -354,6 +421,7 @@ int             ft_close(int keycode, t_game *game)
 		{
 			free(game->map.data[i]);
 		}
+		free(game->sprite.pos);
 		printf("map freed\n\n");
 		exit(0);
 		
@@ -377,6 +445,7 @@ int             main(int argc, char *argv[])
     game.vars.img.addr = mlx_get_data_addr(game.vars.img.img, &game.vars.img.bits_per_pixel, &game.vars.img.line_length,
                                  &game.vars.img.endian);
 	//print_line(vars);	
+		printf("startig renDering\n");
 		render(&game);
 		mlx_hook(game.vars.win, 2, 1L<<0, ft_close, &game);
 		//mlx_key_hook(game.vars.win,ft_close, &game);

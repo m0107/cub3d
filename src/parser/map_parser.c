@@ -22,6 +22,7 @@ int		is_direction(char c)
 
 void	check_input_map_error(char c, t_game *game)
 {
+	printf("Invalid entry: %c\n", c);
 	if (!(c == '1' || c == '2' || c == '0' || c == ' '
 	|| is_direction(c)))
 		printf_error("Invalid map entry.\n", game);
@@ -44,18 +45,36 @@ void	set_player_pos(t_game *game, char c, int y)
 
 	
 }
-void	set_sprite_pos(t_game *game, char c, int y)
+void	set_sprite_pos(t_game *game, char c, int y, int i)
 {
-	game->sprite.x = (double)(game->map.size)+0.5;
-	game->sprite.y = (double)(y)+0.5;	
+	t_sp_pos *temp_sp_pos;
+	int j;
+	printf("set_sprite_pos\n");
+	if (!(temp_sp_pos = (t_sp_pos *)malloc((i+1) * sizeof(temp_sp_pos))))
+		printf_error("malloc sprite failed.\n", game);
+	j = -1;	
+	while (++j < i)
+		temp_sp_pos[j] = game->sprite.pos[j];
+	
+	if (i > 0)
+		free(game->sprite.pos);
+	
+	game->sprite.pos = temp_sp_pos;
+	game->sprite.pos[i].x = (double)(game->map.size)+0.5;
+	game->sprite.pos[i].y = (double)(y)+0.5;	
+	j = -1;
+	while (++j <= i) {
+		printf(" game->sprite.pos[%d].x :%f\n", j, game->sprite.pos[j].x);
+		printf(" game->sprite.pos[%d].y :%f\n", j, game->sprite.pos[j].y);	
+	}
 }
 
 void	map_parser(t_game *game,char *line)
 {
 	char	**temp_map;
 	int		j;
-
 	
+	printf("line: %s\n", line);
 	if (!(temp_map = (char **)malloc((game->map.size+1) * sizeof(char *))))
 		printf_error("malloc map failed.\n", game);
 	j = -1;	
@@ -64,9 +83,11 @@ void	map_parser(t_game *game,char *line)
 	if (game->map.size > 0)
 		free(game->map.data);
 	game->map.data = temp_map;
-	j = 0;
-	while (line[j] != '\0')
+	j = -1;
+
+	while (line[++j] != '\0')
 	{
+		check_input_map_error(line[j], game);
 		if (is_direction(line[j]))
 		{
 			set_player_pos(game, line[j], j);
@@ -74,11 +95,13 @@ void	map_parser(t_game *game,char *line)
 		}
 		else if (line[j] == '2')
 		{
-			set_sprite_pos(game, line[j],j);
+			printf("2 detected.\n");
+			set_sprite_pos(game, line[j],j, game->sprite.size );
 			line[j] = '2';
+			game->sprite.size++;
 		}
-		check_input_map_error(line[j++], game);
 	}
+	printf("game->sprite.size  : %d\n", game->sprite.size );
 	char *str = ft_strdup(line);
 	game->map.data[game->map.size] = str;
 	game->map.size++;
