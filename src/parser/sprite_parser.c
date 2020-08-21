@@ -12,25 +12,19 @@
 
 #include "../cub3d.h"
 
-void	sprite_parser(t_game *game, char *line)
+void	sprite_parser(t_game *g, char *line)
 {
 	int i;
 
-	if (game->map.size > 0)
-		printf_error("Input order incorrect:sprite_parser.\n", game);
+	if (g->map.size > 0)
+		printf_error("Input order incorrect:sprite_parser.\n", g);
 	if (*line == 'S')
 	{
 		i = 4;
-		game->parsCheck[5]++;
+		g->pars_check[5]++;
 	}
-	else if (*line == 'D')
-		i = 5;
-	
-	else if (*line == 'L')
-		i = 6;
 	else
-		printf_error("Invalid texture file", game);
+		printf_error("Invalid texture file", g);
 	line = line + 1;
-	load_texture(game->vars.mlx, remove_space(line), &game->textures[i], game);
+	load_texture(g->vars.mlx, remove_space(line), &g->txs[i], g);
 }
-

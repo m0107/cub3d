@@ -12,95 +12,84 @@
 
 #include "../cub3d.h"
 
-
-void	mp_helpr(char * line, t_game *game)
+void	mp_helpr(char *line, t_game *g)
 {
+	char	*temp;
 
-		char	*temp;
-		temp = line;
-		line  = remove_space(line);
-		if (*line == 'R')
-			res_parser(game,line);
-		else if (*line == 'N'|| (*line == 'S' && *(line+1) == 'O') || *line == 'W' || *line == 'E')
-			tex_parser(game, line);
-		else if (*line == 'F' || *line == 'C')
-			color_parser(game,line);
-		else if (*line == 'S' || *line == 'D' || *line == 'L')
-			sprite_parser(game,line);
-		else if (*line != '\n' && *line !='\0')
-			map_parser(game, temp);
-		else if(game->map.size > 0 && *temp != ' ')
-			printf_error("Empty line in Map.\n", game);
-		free(temp);
-	
+	temp = line;
+	line = remove_space(line);
+	if (*line == 'R')
+		res_parser(g, line);
+	else if (*line == 'N' || (*line == 'S' && *(line + 1) == 'O')
+		|| *line == 'W' || *line == 'E')
+		tex_parser(g, line);
+	else if (*line == 'F' || *line == 'C')
+		color_parser(g, line);
+	else if (*line == 'S')
+		sprite_parser(g, line);
+	else if (*line != '\n' && *line != '\0')
+		map_parser(g, temp);
+	else if (g->map.size > 0 && *temp != ' ')
+		printf_error("Empty line in Map.\n", g);
+	free(temp);
 }
 
-void	init_pars_check(t_game *game)
+void	init_pars_check(t_game *g)
 {
 	int i;
 
 	i = -1;
 	while (++i < 9)
 	{
-		game->parsCheck[i] = -1;
+		g->pars_check[i] = -1;
 	}
-	game->map.size = 0;
-	game->player.posX = -1;
-	game->player.posY = -1;
-	game->sprite.size = 0;
+	g->map.size = 0;
+	g->pl.posx = -1;
+	g->pl.posy = -1;
+	g->sp.size = 0;
 }
 
-void pars_check_result(t_game *game)
+void	pars_check_result(t_game *g)
 {
-
-	if (game->parsCheck[0] != 0)
-		printf_error("Error in input, Resolution missing or double.\n", game);
-	if (game->parsCheck[1] != 0)
-		printf_error("Error in input, North Texture missing or double.\n", game);
-	if (game->parsCheck[2] != 0)
-		printf_error("Error in input, South Texture missing or double.\n", game);
-	if (game->parsCheck[3] != 0)
-		printf_error("Error in input, West Texture missing or double.\n", game);
-	if (game->parsCheck[4] != 0)
-		printf_error("Error in input, East Texture missing or double.\n", game);
-	if (game->parsCheck[5] != 0)
-		printf_error("Error in input, Sprite missing or double.\n", game);
-	if (game->parsCheck[6] != 0)
-		printf_error("Error in input, Floor color missing or double.\n", game);
-	if (game->parsCheck[7] != 0)
-		printf_error("Error in input, Ceiling color missing or double.\n", game);
-	if (game->parsCheck[8] != 0)
-		printf_error("Error in input, Map data missing or double.\n", game);
-	if (game->player.posY < 0 || game->player.posX < 0 )
-			printf_error("Error in input, Player position not set.\n", game);
+	if (g->pars_check[0] != 0)
+		printf_error("Error in input, Resolution missing or double.\n", g);
+	if (g->pars_check[1] != 0)
+		printf_error("Error in input, North Texture missing or double.\n", g);
+	if (g->pars_check[2] != 0)
+		printf_error("Error in input, South Texture missing or double.\n", g);
+	if (g->pars_check[3] != 0)
+		printf_error("Error in input, West Texture missing or double.\n", g);
+	if (g->pars_check[4] != 0)
+		printf_error("Error in input, East Texture missing or double.\n", g);
+	if (g->pars_check[5] != 0)
+		printf_error("Error in input, Sprite missing or double.\n", g);
+	if (g->pars_check[6] != 0)
+		printf_error("Error in input, Floor color missing or double.\n", g);
+	if (g->pars_check[7] != 0)
+		printf_error("Error in input, Ceiling color missing or double.\n", g);
+	if (g->pars_check[8] != 0)
+		printf_error("Error in input, Map data missing or double.\n", g);
+	if (g->pl.posy < 0 || g->pl.posx < 0)
+		printf_error("Error in input, Player position not set.\n", g);
 }
 
-void	main_parser(t_game *game, char *filename)
+void	main_parser(t_game *g, char *filename)
 {
 	int		fd;
 	int		t;
 	char	*line;
 	char	**map;
 
-	printf("parsing starting\n");
-	init_pars_check(game);
+	init_pars_check(g);
 	if ((fd = open(filename, O_RDONLY)) < 1)
-		printf_error("invalid filepath\n", game);
+		printf_error("invalid filepath\n", g);
 	while ((t = get_next_line(fd, &line)) == 1)
-		mp_helpr(line, game);
-	printf("debug*******************\n\n\n");
-	if	(t < 0)
-		printf_error("get_next_line failed.\n", game);
-	mp_helpr(line, game);
-	printf("parsing done\n");
-	game->parsCheck[8]++;
-	pars_check_result(game);
-	printf("res %d\n\n", game->vars.screenheight);
-	printf("res %d\n\n", game->vars.screenwidth);
-	printf("map.player.pos x :%f\n\n", game->player.posX);
-	printf("map.player.pos y :%f\n\n", game->player.posY);
-	check_map(game);
-	printf("map checked\n");
-	//exit(0);
+		mp_helpr(line, g);
+	if (t < 0)
+		printf_error("get_next_line failed.\n", g);
+	mp_helpr(line, g);
+	g->pars_check[8]++;
+	pars_check_result(g);
+	check_map(g);
 	close(fd);
 }

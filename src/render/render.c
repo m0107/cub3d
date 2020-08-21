@@ -12,58 +12,53 @@
 
 #include "../cub3d.h"
 
-void    render_start_init(t_game *game)
+void	render_start_init(t_game *g)
 {
-
-	game->render.lineHeight = (int)(game->vars.screenheight / game->render.perpWallDist);
-	game->render.drawStart = -game->render.lineHeight / 2 + game->vars.screenheight / 2;
-	if(game->render.drawStart < 0)
-		game->render.drawStart = 0;
-	game->render.drawEnd = game->render.lineHeight / 2 + game->vars.screenheight / 2;
-	if(game->render.drawEnd >= game->vars.screenheight)
-		game->render.drawEnd = game->vars.screenheight - 1;
-	if (game->render.side == 0) game->render.wallX = game->player.posY + game->render.perpWallDist * game->render.rayDirY;
-	else          game->render. wallX = game->player.posX + game->render.perpWallDist * game->render.rayDirX;
-	game->render.wallX -= floor((game->render.wallX));
-
-	//x coordinate on the texture
-	game->render.texX = (int)(game->render.wallX * (double)(texWidth));
-	if(game->render.side == 0 && game->render.rayDirX > 0)
-        game->render.texX = texWidth - game->render.texX - 1;
-	if(game->render.side == 1 && game->render.rayDirY < 0)
-        game->render.texX = texWidth - game->render.texX - 1;
-	game->render.step = 1.0 * texHeight / game->render.lineHeight;
-	game->render.texPos = (game->render.drawStart - game->vars.screenheight / 2 + game->render.lineHeight / 2) * game->render.step;
-	
+	g->r.lineheight = (int)(g->vars.scn_h / g->r.pwd);
+	g->r.drawstart = -g->r.lineheight / 2 + g->vars.scn_h / 2;
+	if (g->r.drawstart < 0)
+		g->r.drawstart = 0;
+	g->r.drawend = g->r.lineheight / 2 + g->vars.scn_h / 2;
+	if (g->r.drawend >= g->vars.scn_h)
+		g->r.drawend = g->vars.scn_h - 1;
+	if (g->r.side == 0)
+		g->r.wallx = g->pl.posy + g->r.pwd * g->r.raydiry;
+	else
+		g->r.wallx = g->pl.posx + g->r.pwd * g->r.raydirx;
+	g->r.wallx -= floor((g->r.wallx));
+	g->r.texx = (int)(g->r.wallx * (double)(TEX_WIDTH));
+	if (g->r.side == 0 && g->r.raydirx > 0)
+		g->r.texx = TEX_WIDTH - g->r.texx - 1;
+	if (g->r.side == 1 && g->r.raydiry < 0)
+		g->r.texx = TEX_WIDTH - g->r.texx - 1;
+	g->r.step = 1.0 * TEX_HEIGHT / g->r.lineheight;
+	g->r.texpos = (g->r.drawstart - g->vars.scn_h / 2 +
+		g->r.lineheight / 2) * g->r.step;
 }
 
-void	render_start(t_game *game, int x)
+void	render_start(t_game *g, int x)
 {
-    
-    render_start_init(game);
-    render_ceiling(game, x);
-    render_wall(game, x);
-	render_floor(game, x);
-    game->render.ZBuffer[x] = game->render.perpWallDist; //perpendicular distance is used
+	render_start_init(g);
+	render_ceiling(g, x);
+	render_wall(g, x);
+	render_floor(g, x);
+	g->r.zbuffer[x] = g->r.pwd;
 }
 
-void	render(t_game *game)
+void	render(t_game *g)
 {
 	int x;
 
 	x = -1;
-	while (++x < game->vars.screenwidth) 
+	while (++x < g->vars.scn_w)
 	{
-		render_init(game, x);
-		dda(game);
-        if (game->render.perpWallDist <= 0.0000001f)
-		    return;
-		render_start(game, x);
+		render_init(g, x);
+		dda(g);
+		if (g->r.pwd <= 0.0000001f)
+			return ;
+		render_start(g, x);
 	}
-	render_sprites(game);
-    printf("drawing finished\n\n");
-	int e;
-	mlx_put_image_to_window(game->vars.mlx, game->vars.win, game->vars.img.img, 0, 0);
-	
-	printf("rendering done\n\n");
+	render_sprites(g);
+	mlx_put_image_to_window(g->vars.mlx, g->vars.win,
+		g->vars.img.img, 0, 0);
 }

@@ -12,48 +12,45 @@
 
 #include "../cub3d.h"
 
-void	check_n_set_res(t_game *game, int screenwidth, int screenheight)
+void	check_n_set_res(t_game *g, int scn_w, int scn_h)
 {
-	if (screenwidth > 2560 || screenwidth == -942514)
-		screenwidth = 1600;
-	if (screenheight > 1440 || screenheight == -942514)
-		screenheight = 900;
-	
-	if(screenwidth <= 0 || screenheight <= -1)
-		printf_error("Invalid Resolution\n", game);
-	
-	game->vars.screenheight = screenheight;
-	game->vars.screenwidth = screenwidth;
-	if (!(game->render.ZBuffer = (int *)malloc((game->vars.screenwidth) * sizeof(int))))
-		printf_error("malloc map failed.\n", game);
-
+	if (scn_w > 2560 || scn_w == -942514)
+		scn_w = 1600;
+	if (scn_h > 1440 || scn_h == -942514)
+		scn_h = 900;
+	if (scn_w <= 0 || scn_h <= -1)
+		printf_error("Invalid Resolution\n", g);
+	g->vars.scn_h = scn_h;
+	g->vars.scn_w = scn_w;
+	if (!(g->r.zbuffer = (int *)malloc((g->vars.scn_w) * sizeof(int))))
+		printf_error("malloc map failed.\n", g);
 }
 
-void remove_extra(char **line)
+void	remove_extra(char **line)
 {
-	while(**line >= '0' && **line <= '9')
+	while (**line >= '0' && **line <= '9')
 		(*line)++;
 }
 
-void	res_parser(t_game *game, char *line)
+void	res_parser(t_game *g, char *line)
 {
-	int	screenwidth;
-	int	screenheight;
+	int	scn_w;
+	int	scn_h;
 	int	loop_len;
 
-	if (game->map.size > 0)
-		printf_error("Input order incorrect:res_parser.\n", game);
+	if (g->map.size > 0)
+		printf_error("Input order incorrect:res_parser.\n", g);
 	line = line + 2;
-	screenwidth = ft_atoi_cub(&line);
+	scn_w = ft_atoi_cub(&line);
 	remove_extra(&line);
-	screenheight = ft_atoi_cub(&line);
+	scn_h = ft_atoi_cub(&line);
 	remove_extra(&line);
 	while (*line != '\0')
 	{
-		if(*line != ' ')
-			printf_error("Extra input in resolution\n", game);
+		if (*line != ' ')
+			printf_error("Extra input in resolution\n", g);
 		line++;
 	}
-	check_n_set_res(game, screenwidth, screenheight);
-	game->parsCheck[0]++;
+	check_n_set_res(g, scn_w, scn_h);
+	g->pars_check[0]++;
 }

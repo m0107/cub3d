@@ -12,55 +12,66 @@
 
 #include "../cub3d.h"
 
-void render_init(t_game *game, int x)
+void	render_init_helper(t_game *g)
 {
-	game->render.cameraX = 2 * x / (double)game->vars.screenwidth - 1; //x-coordinate in camera space
-	game->render.rayDirX = game->player.dirX + game->player.planeX * game->render.cameraX;
-	game->render.rayDirY = game->player.dirY + game->player.planeY * game->render.cameraX;
-	//which box of the map we're in
-	game->render.mapX = (int)(game->player.posX);
-	game->render.mapY = (int)(game->player.posY);
-
-
-	//length of ray from one x or y-side to next x or y-side
-	game->render.deltaDistX = fabs(1 / game->render.rayDirX);
-	game->render.deltaDistY = fabs(1 / game->render.rayDirY);
-
-	game->render.hit = 0; //was there a wall hit?
-	if(game->render.rayDirX < 0) {
-		game->render.stepX = -1;
-		game->render.sideDistX = (game->player.posX - game->render.mapX) * game->render.deltaDistX;
-	}else {
-		game->render.stepX = 1;
-		game->render.sideDistX = (game->render.mapX + 1.0 - game->player.posX) * game->render.deltaDistX;
+	if (g->r.raydirx < 0)
+	{
+		g->r.stepx = -1;
+		g->r.sidedistx = (g->pl.posx - g->r.mapx) * g->r.deltadistx;
 	}
-	if(game->render.rayDirY < 0) {
-		game->render.stepY = -1;
-		game->render.sideDistY = (game->player.posY - game->render.mapY) * game->render.deltaDistY;
-	}else {
-		game->render.stepY = 1;
-		game->render.sideDistY = (game->render.mapY + 1.0 - game->player.posY) * game->render.deltaDistY;
+	else
+	{
+		g->r.stepx = 1;
+		g->r.sidedistx = (g->r.mapx + 1.0 - g->pl.posx) * g->r.deltadistx;
+	}
+	if (g->r.raydiry < 0)
+	{
+		g->r.stepy = -1;
+		g->r.sidedisty = (g->pl.posy - g->r.mapy) * g->r.deltadisty;
+	}
+	else
+	{
+		g->r.stepy = 1;
+		g->r.sidedisty = (g->r.mapy + 1.0 - g->pl.posy) * g->r.deltadisty;
 	}
 }
 
-void	dda(t_game *game)
+void	render_init(t_game *g, int x)
 {
-	while (game->render.hit == 0) 
+	g->r.camerax = 2 * x / (double)g->vars.scn_w - 1;
+	g->r.raydirx = g->pl.dirx + g->pl.plnx * g->r.camerax;
+	g->r.raydiry = g->pl.diry + g->pl.plny * g->r.camerax;
+	g->r.mapx = (int)(g->pl.posx);
+	g->r.mapy = (int)(g->pl.posy);
+	g->r.deltadistx = fabs(1 / g->r.raydirx);
+	g->r.deltadisty = fabs(1 / g->r.raydiry);
+	g->r.hit = 0;
+	render_init_helper(g);
+}
+
+void	dda(t_game *g)
+{
+	while (g->r.hit == 0)
 	{
-		if (game->render.sideDistX < game->render.sideDistY) {
-			game->render.sideDistX += game->render.deltaDistX;
-			game->render.mapX += game->render.stepX;
-			game->render.side = 0;
-		} else {
-			game->render.sideDistY += game->render.deltaDistY;
-			game->render.mapY += game->render.stepY;
-			game->render.side = 1;
+		if (g->r.sidedistx < g->r.sidedisty)
+		{
+			g->r.sidedistx += g->r.deltadistx;
+			g->r.mapx += g->r.stepx;
+			g->r.side = 0;
 		}
-		//Check if ray has hit a wall
-		if(game->map.data[game->render.mapX][game->render.mapY] == '1')
-			game->render.hit = 1;
-		
+		else
+		{
+			g->r.sidedisty += g->r.deltadisty;
+			g->r.mapy += g->r.stepy;
+			g->r.side = 1;
+		}
+		if (g->map.data[g->r.mapx][g->r.mapy] == '1')
+			g->r.hit = 1;
 	}
-	if(game->render.side == 0) game->render.perpWallDist = (game->render.mapX - game->player.posX + (1 - game->render.stepX) / 2) / game->render.rayDirX;
-	else          game->render.perpWallDist = (game->render.mapY - game->player.posY + (1 - game->render.stepY) / 2) / game->render.rayDirY;
+	if (g->r.side == 0)
+		g->r.pwd = (g->r.mapx - g->pl.posx +
+			(1 - g->r.stepx) / 2) / g->r.raydirx;
+	else
+		g->r.pwd = (g->r.mapy - g->pl.posy +
+			(1 - g->r.stepy) / 2) / g->r.raydiry;
 }

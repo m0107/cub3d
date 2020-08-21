@@ -86,8 +86,8 @@ int		get_next_line(int const fd, char **line)
 	int			i;
 	int			ret;
 	char		*temp;
-	
-	if (checkerror(fd, &str, line) == -1) // Check all errors in input file and return (-1) ina nany found
+
+	if (checkerror(fd, &str, line) == -1)
 		return (-1);
 	i = 0;
 	ret = 1;

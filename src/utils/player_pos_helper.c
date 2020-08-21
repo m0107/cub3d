@@ -12,35 +12,34 @@
 
 #include "../cub3d.h"
 
-void	set_pos_north(t_game *game)
+void	set_pos_north(t_game *g)
 {
-	game->player.dirX = -1; 
-	game->player.dirY = 0; //initial direction vector
-	game->player.planeX = 0; 
-	game->player.planeY = 0.66; //the 2d raycaster version of camera plane
+	g->pl.dirx = -1;
+	g->pl.diry = 0;
+	g->pl.plnx = 0;
+	g->pl.plny = 0.66;
 }
 
-void	set_pos_south(t_game *game)
+void	set_pos_south(t_game *g)
 {
-	game->player.dirX = 1; 
-	game->player.dirY = 0; //initial direction vector
-	game->player.planeX = 0; 
-	game->player.planeY = -0.66; //the 2d raycaster version of camera plane		
+	g->pl.dirx = 1;
+	g->pl.diry = 0;
+	g->pl.plnx = 0;
+	g->pl.plny = -0.66;
 }
 
-void	set_pos_east(t_game *game)
+void	set_pos_east(t_game *g)
 {
-
-	game->player.dirX = 0; 
-	game->player.dirY = 1; //initial direction vector
-	game->player.planeX = 0.66; 
-	game->player.planeY = 0; //the 2d raycaster version of camera plane		
+	g->pl.dirx = 0;
+	g->pl.diry = 1;
+	g->pl.plnx = 0.66;
+	g->pl.plny = 0;
 }
 
-void	set_pos_west(t_game *game)
+void	set_pos_west(t_game *g)
 {
-	game->player.dirX = 0; 
-	game->player.dirY = -1; //initial direction vector
-	game->player.planeX = -0.66; 
-	game->player.planeY = 0; //the 2d raycaster version of camera plane		
+	g->pl.dirx = 0;
+	g->pl.diry = -1;
+	g->pl.plnx = -0.66;
+	g->pl.plny = 0;
 }

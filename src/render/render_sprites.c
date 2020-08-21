@@ -12,71 +12,77 @@
 
 #include "../cub3d.h"
 
-void sort(t_p_order *sprites, int amount)
+void	sort(t_p_order *sprites, int amount)
 {
-    int i;
-    int j; 
+	int		i;
+	int		j;
 	double	tempx;
-    int	tempy;
+	int		tempy;
 
-
-    i = -1;
-    while (++i < amount-1) 
+	i = -1;
+	while (++i < amount - 1)
 	{
-        j = -1;
-        while (++j < amount-i-1)  
-        {
-				if (sprites[j].first > sprites[j+1].first) 
-				{			
-					tempx = sprites[j].first;
-					sprites[j].first = sprites[j + 1].first;
-					sprites[j +1].first = tempx;
-					tempy = sprites[j].second;
-					sprites[j].second= sprites[j + 1].second;
-					sprites[j +1].second= tempy;
-				}
+		j = -1;
+		while (++j < amount - i - 1)
+		{
+			if (sprites[j].first > sprites[j + 1].first)
+			{
+				tempx = sprites[j].first;
+				sprites[j].first = sprites[j + 1].first;
+				sprites[j + 1].first = tempx;
+				tempy = sprites[j].second;
+				sprites[j].second = sprites[j + 1].second;
+				sprites[j + 1].second = tempy;
+			}
 		}
 	}
 }
 
-void sortSprites(t_game *game, t_rndr_sprite *rndr_sprites)
+void	sort_sprites(t_game *g, t_rndr_sprite *rndr_sprites)
 {
-    t_p_order   *sprites;
-    int         i;
-	int         j;
+	t_p_order	*sprites;
+	int			i;
+	int			j;
 
-    sprites = (t_p_order *)malloc((game->sprite.size) * sizeof(t_p_order));
-    i = -1;
-    while (++i < game->sprite.size)
-    {
-        sprites[i].first = rndr_sprites->spriteDistance[i];
-        sprites[i].second = rndr_sprites->spriteOrder[i];
-    }
-    sort(sprites, game->sprite.size);
-	for(int i = 0; i < game->sprite.size; i++) {
-        rndr_sprites->spriteDistance[i] = sprites[game->sprite.size - i - 1].first;
-        rndr_sprites->spriteOrder[i] = sprites[game->sprite.size - i - 1].second;
-    }
-    free(sprites);
+	sprites = (t_p_order *)malloc((g->sp.size) * sizeof(t_p_order));
+	i = -1;
+	while (++i < g->sp.size)
+	{
+		sprites[i].first = rndr_sprites->sp_dist[i];
+		sprites[i].second = rndr_sprites->spriteorder[i];
+	}
+	sort(sprites, g->sp.size);
+	i = -1;
+	while (++i < g->sp.size)
+	{
+		rndr_sprites->sp_dist[i] =
+			sprites[g->sp.size - i - 1].first;
+		rndr_sprites->spriteorder[i] =
+			sprites[g->sp.size - i - 1].second;
+	}
+	free(sprites);
 }
 
-void    render_sprites(t_game *game)
+void	render_sprites(t_game *g)
 {
-    int i;
-    t_rndr_sprite rndr_sprites;
+	int				i;
+	t_rndr_sprite	r_sp;
 
-	if (!(rndr_sprites.spriteOrder = (int *)malloc((game->sprite.size) * sizeof(int))))
-		printf_error("malloc spriteOrder failed.\n", game);
-	if (!(rndr_sprites.spriteDistance = (double *)malloc((game->sprite.size) * sizeof(double))))
-		printf_error("malloc spriteOrder failed.\n", game);
+	if (!(r_sp.spriteorder = (int *)malloc((g->sp.size) * sizeof(int))))
+		printf_error("malloc spriteorder failed.\n", g);
+	if (!(r_sp.sp_dist = (double *)malloc((g->sp.size) * sizeof(double))))
+		printf_error("malloc spriteorder failed.\n", g);
 	i = -1;
-    while (++i < game->sprite.size)
-    {
-      rndr_sprites.spriteOrder[i] = i;
-      rndr_sprites.spriteDistance[i] = sqrt(((game->player.posX - game->sprite.pos[i].x) * (game->player.posX - game->sprite.pos[i].x) + (game->player.posY - game->sprite.pos[i].y) * (game->player.posY - game->sprite.pos[i].y))); //sqrt not taken, unneeded
-    }
-    sortSprites(game, &rndr_sprites);
-    render_sprites_helper(game, &rndr_sprites);
-	free(rndr_sprites.spriteOrder);
-	free(rndr_sprites.spriteDistance);	
+	while (++i < g->sp.size)
+	{
+		r_sp.spriteorder[i] = i;
+		r_sp.sp_dist[i] = ((g->pl.posx - g->sp.pos[i].x)
+			* (g->pl.posx - g->sp.pos[i].x)
+			+ (g->pl.posy - g->sp.pos[i].y)
+			* (g->pl.posy - g->sp.pos[i].y));
+	}
+	sort_sprites(g, &r_sp);
+	render_sprites_helper(g, &r_sp);
+	free(r_sp.spriteorder);
+	free(r_sp.sp_dist);
 }

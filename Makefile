@@ -30,16 +30,20 @@ RM = rm -f   # rm command
 #include all your main .c files here
 SRCS = ./src/main.c \
 src/error.c \
+src/keys_hook.c \
 src/parser/main_parser.c \
 src/parser/tex_parser.c \
 src/parser/sprite_parser.c \
 src/parser/res_parser.c \
 src/parser/color_parser.c \
 src/parser/map_parser.c \
+src/parser/map_parser_helper.c \
 src/utils/ft_atoi_cub.c \
 src/utils/map_check.c \
 src/utils/player_pos_helper.c \
 src/utils/space.c \
+src/movement/move.c \
+src/movement/move1.c \
 src/render/render.c \
 src/render/render_sprites.c \
 src/render/render_sprites_helper.c \

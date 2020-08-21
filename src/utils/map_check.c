@@ -12,57 +12,54 @@
 
 #include "../cub3d.h"
 
-void 	check_map_borders(t_game *game)
-{
-	int k;
-
-	k = -1;
-	while(game->map.data[0][++k] != '\0')
-	{
-		if(game->map.data[0][k] == '0')
-			printf_error("Map not closed.\n", game);
-	}
-	k = -1;
-	while(game->map.data[game->map.size - 1][++k] != '\0')
-	{
-		if(game->map.data[game->map.size - 1][k] == '0')
-			printf_error("Map not closed.\n", game);
-	}
-	k = -1;
-	while(++k < game->map.size)
-	{
-		if(game->map.data[k][0] == '0')
-			printf_error("Map not closed.\n", game);
-	}	
-}
-
-int		check_map_input(t_map map, int i, int j)
-{
-	if (map.data[i][j] == '0')
-	{
-	
-
-	}
-	return(0);
-}	
-
-void	check_map(t_game *game)
+void	convert_map(t_game *g, char to_change, char new_char)
 {
 	int i;
 	int j;
 
-	i = 0;
-	check_map_borders(game);
-	while (++i < game->map.size - 1)
+	i = -1;
+	while (++i < g->map.size)
 	{
-		j = 1;
-		while (game->map.data[i][j] != '\0')
+		j = -1;
+		while (g->map.data[i][++j] != '\0')
 		{
-			if(check_map_input(game->map, i, j))
-				printf_error("Map not closed. :err1\n", game);
-			j++;
+			if (g->map.data[i][j] == to_change)
+				g->map.data[i][j] = new_char;
 		}
-		printf("\n");
 	}
-	// exit(0);
+}
+
+int		is_boundary(t_game *g, int i, int j)
+{
+	if (i == 0 || i == g->map.size - 1 ||
+		g->map.data[i][j + 1] == '\0')
+		return (1);
+	else if (g->map.data[i + 1][j] == ' ' || g->map.data[i][j + 1] == ' ' ||
+		g->map.data[i - 1][j] == ' ' || g->map.data[i][j - 1] == ' ')
+		return (1);
+	return (0);
+}
+
+void	check(t_game *g, int i, int j)
+{
+	if (g->map.data[i][j] == '1' || g->map.data[i][j] == '8'
+		|| g->map.data[i][j] == '9')
+		return ;
+	else if (is_boundary(g, i, j))
+		printf_error("Map is not closed.", g);
+	if (g->map.data[i][j] == '2')
+		g->map.data[i][j] = '9';
+	if (g->map.data[i][j] == '0')
+		g->map.data[i][j] = '8';
+	check(g, i + 1, j);
+	check(g, i, j + 1);
+	check(g, i - 1, j);
+	check(g, i, j - 1);
+}
+
+void	check_map(t_game *g)
+{
+	check(g, (int)g->pl.posx + 0.5, (int)g->pl.posy + 0.5);
+	convert_map(g, '8', '0');
+	convert_map(g, '9', '2');
 }
