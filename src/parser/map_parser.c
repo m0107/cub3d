@@ -23,7 +23,7 @@ int		is_direction(char c)
 void	check_input_map_error(char c, t_game *game)
 {
 	if (!(c == '1' || c == '2' || c == '0' || c == ' '
-	|| is_direction(c)))
+	|| is_direction(c) || c == '3' || c == '4'))
 		printf_error("Invalid map entry.\n", game);
 }
 
@@ -66,8 +66,11 @@ void	set_sprite_pos(t_game *game, char c, int y, int i)
 	printf("Mohit   i: %d\n\n\n",i);
 	game->sprite.pos[i].x = (double)(game->map.size + 0.5);
 	game->sprite.pos[i].y = (double)y +0.5;	
+	game->sprite.pos[i].texture = ((int)c - 46);
 	printf(" game->sprite.pos[%d].x :%f\n", i, game->sprite.pos[i].x);
-		printf(" game->sprite.pos[%d].y :%f\n", i, game->sprite.pos[i].y);	
+	printf(" game->sprite.pos[%d].y :%f\n", i, game->sprite.pos[i].y);	
+	printf(" game->sprite.pos[%d].texture :%d\n", i, game->sprite.pos[i].texture);
+	//exit(0);
 	// if (i > 0){
 	// 	printf("freeing sprite arrayn\n\n\n");
 	// 	free(game->sprite.pos);
@@ -105,7 +108,7 @@ void	map_parser(t_game *game,char *line)
 			set_player_pos(game, line[j], j);
 			line[j] = '0';
 		}
-		else if (line[j] == '2')
+		else if (line[j] >= '2' && line[j] <= '4')
 		{
 			printf("2 detected.\n");
 			set_sprite_pos(game, line[j],j, game->sprite.size );

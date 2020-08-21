@@ -84,22 +84,70 @@ typedef struct	s_map {
 typedef struct s_sp_pos {
 	double	x;
 	double	y;
+	int		texture;
 }				t_sp_pos;
 
 typedef struct s_sprite {
-	t_texture	texture;
 	t_sp_pos	*pos;
 	int			size;
 }				t_sprite;
 
+
+typedef struct s_render {
+	int		*ZBuffer;
+	double	cameraX;
+	double	rayDirX;
+	double	rayDirY;
+	int		mapX;
+	int		mapY;
+	double	sideDistX;
+	double	sideDistY;
+	double	deltaDistX;
+	double	deltaDistY;
+	double	perpWallDist;
+	int		stepX;
+	int		stepY;
+	int		hit;
+	int		side;
+	int		lineHeight;
+	int		drawStart;
+	int		drawEnd;
+	double	wallX;
+	int		texX;
+	int		texY;
+	double	step;
+	double	texPos;
+}				t_render;
+
+typedef struct  s_rndr_sprite {
+    int		*spriteOrder;
+	double	*spriteDistance;
+	double	spriteX;
+	double	spriteY;
+	double	invDet;
+	double transformX;
+	double transformY;
+	int spriteScreenX;
+	int spriteHeight;
+	int spriteWidth;
+	int drawStartY;
+	int drawEndY;
+	int drawStartX;
+	int drawEndX;
+
+
+}               t_rndr_sprite;
+
+
+
 typedef struct  s_game {
-	int temp;
 	int			parsCheck[9];
     t_player	player;
-	t_texture	textures[4];
+	t_texture	textures[7];
 	t_vars		vars;
 	t_map		map;
 	t_sprite	sprite;
+	t_render	render;
 }               t_game;
 
 typedef struct	s_p_order {
@@ -133,5 +181,22 @@ void	set_pos_south(t_game *game);
 void	set_pos_east(t_game *game);
 void	set_pos_west(t_game *game);
 
+void	render(t_game *game);
+void	render_start(t_game *game, int x);
+void    render_start_init(t_game *game);
+void	render_init(t_game *game, int x);
+void	dda(t_game *game);
+void    render_ceiling(t_game *game, int x);
+void    render_floor(t_game *game, int x);
+void	render_wall(t_game *game, int x);
+void	render_sprites(t_game *game);
+void	render_sprites_helper(t_game *game, t_rndr_sprite *rndr_sprites);
+
+
+
+
+void	draw_pixel(t_vars *vars, unsigned int x, unsigned int y, unsigned char color[4]);
+void	my_mlx_pixel_put(t_vars *vars, int x, int y, int color);
+void	get_pixel_color(t_texture texture, int x, int y, unsigned char *result);
 
 #endif

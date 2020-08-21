@@ -40,6 +40,12 @@ src/utils/ft_atoi_cub.c \
 src/utils/map_check.c \
 src/utils/player_pos_helper.c \
 src/utils/space.c \
+src/render/render.c \
+src/render/render_sprites.c \
+src/render/render_sprites_helper.c \
+src/render/render_helper.c \
+src/render/render_component.c \
+
 
 GNL_SRCS = gnl/get_next_line.c \
 gnl/get_next_line_utils.c \

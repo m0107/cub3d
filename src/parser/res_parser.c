@@ -15,15 +15,18 @@
 void	check_n_set_res(t_game *game, int screenwidth, int screenheight)
 {
 	if (screenwidth > 2560 || screenwidth == -942514)
-		screenwidth = 2560;
+		screenwidth = 1600;
 	if (screenheight > 1440 || screenheight == -942514)
-		screenheight = 1440;
+		screenheight = 900;
 	
 	if(screenwidth <= 0 || screenheight <= -1)
 		printf_error("Invalid Resolution\n", game);
 	
 	game->vars.screenheight = screenheight;
 	game->vars.screenwidth = screenwidth;
+	if (!(game->render.ZBuffer = (int *)malloc((game->vars.screenwidth) * sizeof(int))))
+		printf_error("malloc map failed.\n", game);
+
 }
 
 void remove_extra(char **line)
@@ -39,7 +42,7 @@ void	res_parser(t_game *game, char *line)
 	int	loop_len;
 
 	if (game->map.size > 0)
-		printf_error("Input order incorrect.\n", game);
+		printf_error("Input order incorrect:res_parser.\n", game);
 	line = line + 2;
 	screenwidth = ft_atoi_cub(&line);
 	remove_extra(&line);

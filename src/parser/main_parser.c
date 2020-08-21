@@ -25,7 +25,7 @@ void	mp_helpr(char * line, t_game *game)
 			tex_parser(game, line);
 		else if (*line == 'F' || *line == 'C')
 			color_parser(game,line);
-		else if (*line == 'S')
+		else if (*line == 'S' || *line == 'D' || *line == 'L')
 			sprite_parser(game,line);
 		else if (*line != '\n' && *line !='\0')
 			map_parser(game, temp);
@@ -44,7 +44,6 @@ void	init_pars_check(t_game *game)
 	{
 		game->parsCheck[i] = -1;
 	}
-	game->temp = 0;
 	game->map.size = 0;
 	game->player.posX = -1;
 	game->player.posY = -1;

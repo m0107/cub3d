@@ -74,7 +74,7 @@ void	color_parser(t_game *game, char *line)
 {
 	check_color_line(line, game);
 	if (game->map.size > 0)
-		printf_error("Input order incorrect.\n", game);
+		printf_error("Input order incorrect:color_parser.\n", game);
 	if (*line++ == 'F')
 	{
 		cp_helpr(line, game, 1);

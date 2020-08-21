@@ -14,12 +14,23 @@
 
 void	sprite_parser(t_game *game, char *line)
 {
-	
-	if (game->map.size > 0)
-		printf_error("Input order incorrect.\n", game);
+	int i;
 
+	if (game->map.size > 0)
+		printf_error("Input order incorrect:sprite_parser.\n", game);
+	if (*line == 'S')
+	{
+		i = 4;
+		game->parsCheck[5]++;
+	}
+	else if (*line == 'D')
+		i = 5;
+	
+	else if (*line == 'L')
+		i = 6;
+	else
+		printf_error("Invalid texture file", game);
 	line = line + 1;
-	load_texture(game->vars.mlx, remove_space(line), &game->sprite.texture, game);
-	game->parsCheck[5]++;
+	load_texture(game->vars.mlx, remove_space(line), &game->textures[i], game);
 }
 

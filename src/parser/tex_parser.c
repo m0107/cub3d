@@ -15,10 +15,12 @@
 void	tex_parser(t_game *game, char *line)
 {
 	int i;
-
+	printf("line: %s\n", line);
+	printf("line _c: |%c|\n", *line);
+	
 	i = 0;
 	if (game->map.size > 0)
-		printf_error("Input order incorrect.\n", game);
+		printf_error("Input order incorrect: tex_parser\n", game);
 	if (*line == 'N')
 		i = 0;
 	else if (*line == 'S')
